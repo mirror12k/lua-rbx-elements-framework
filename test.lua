@@ -165,13 +165,13 @@ TestSuite = class 'test.TestSuite' {
 }
 
 
-local tests = new 'test.TestSuite' ('expirements')
+-- local tests = new 'test.TestSuite' ('expirements')
 
-print(isa(tests, TestSuite))
-tests:test(1, 1)
-tests:test(false, true)
-tests:test({}, {})
-tests:finish()
+-- print(isa(tests, TestSuite))
+-- tests:test(1, 1)
+-- tests:test(false, true)
+-- tests:test({}, {})
+-- tests:finish()
 
 
 
@@ -184,9 +184,18 @@ tests:finish()
 -- print(compare_tables({ {1, 2}, 'asdf', {3, 4}}, { {0, 2}, 'asdf', {3, 4}}))
 
 
+local tests = new 'test.TestSuite' ('stringy tests')
 
+tests:test(stringed_table_to_table(table_to_stringed_table({15, 13, 11})), {15, 13, 11})
+tests:test(stringed_table_to_table(table_to_stringed_table({15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'})), {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'})
+tests:test(stringed_table_to_table(table_to_stringed_table({{15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}, {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}})),
+		{{15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}, {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}})
+tests:test(stringed_table_to_table(table_to_stringed_table({['as df'] = {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'},
+		['nope lol what'] = {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}})),
+		{['as df'] = {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'},
+		['nope lol what'] = {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}})
 
-
+tests:finish()
 
 
 
