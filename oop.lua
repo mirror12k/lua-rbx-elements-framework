@@ -5,6 +5,20 @@
 
 
 
+--[[
+	to call super methods, refer to your own class and index .super (do not use self.super, it will be misleading)
+]]
+
+
+
+
+-- returns true if the object is an instance or subclass of the given class
+function isa (obj, class)
+	if type(obj) == 'table' and type(obj._isa) == 'function' then
+		return obj:_isa(class)
+	end
+	return false
+end
 
 
 base_object = {
@@ -48,7 +62,9 @@ base_object = {
 	end,
 	-- internal function which creates a special instance of the class which is it's own class
 	_subclass = function (self, class)
+		-- this is to avoid looking up the static init method from parents
 		local static_init = class._static_init
+
 		-- set the important stuff
 		class.super = self
 		class.class = class
@@ -85,7 +101,7 @@ base_object = {
 		return class
 	end,
 	-- internal function which returns true if this object is an instance of the given class or superclass
-	-- use the functional isa() instead
+	-- use the functional or oop isa() instead
 	_isa = function (self, class)
 		local c = self.class
 		while c do
@@ -94,27 +110,19 @@ base_object = {
 		end
 		return false
 	end,
+	-- in case the functional isa() isn't comfortable to use
+	isa = function (self, class)
+		return self:_isa(class)
+	end,
 }
 base_object.__index = base_object
-base_object.__call = base_object._new
+-- new is better
+-- base_object.__call = base_object._new
 
 
 function class (definition)
-	local parent
-	if definition._extends then
-		parent = definition._extends
-	else
-		parent = base_object
-	end
+	local parent = definition._extends or base_object
 	return parent:_subclass(definition)
-end
-
--- returns true if the object is an instance or subclass of the given class
-function isa (obj, class)
-	if type(obj) == 'table' and type(obj._isa) == 'function' then
-		return obj:_isa(class)
-	end
-	return false
 end
 
 
