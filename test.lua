@@ -1,6 +1,8 @@
 
-require('oop')
-require('stringy')
+require('./util')
+require('./oop')
+require('./stringy')
+require('./debug')
 
 print 'hello world!'
 
@@ -42,6 +44,9 @@ print 'hello world!'
 
 
 print(table_to_stringed_table({1, 2, 3, 4, ['asdf'] = 'qwerty'}))
+
+-- print_table({1, 5, {'a', 'b'}})
+print_table(stringed_table_to_table '{[1]=1,[2]=2,[3]=3,[4]=4,["asdf lol"]="qwerty"}')
 
 -- local stk = Stack.new()
 -- stk:push('asdf'):push('qwerty'):push(15)

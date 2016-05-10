@@ -1,6 +1,6 @@
 
 
-require('util')
+require('./util')
 
 --[[
 	stringed tables are a subset of regular tables that lack many advanced table-tools
@@ -11,7 +11,7 @@ require('util')
 
 
 
-
+-- converts a stringed table to a proper table, returns new table
 function stringed_table_to_table(stringed_table)
 	if string.sub(stringed_table, 1, 1) ~= '{' then
 		error('malformed stringed table:' .. string.sub(stringed_table, 1, 1))
@@ -28,15 +28,16 @@ function stringed_table_to_table(stringed_table)
 			t = depth_stack:pop()
 			o = p2 + 1
 		else
-			local key = string.sub(stringed_table,o,p - 1)
-			if string.sub(key, 1, 1) == '[' then
+			local key = string.sub(stringed_table, o, p - 1)
+			if string.sub(key, 1, 2) == '["' then
+				key = string.sub(key, 3, -3)
+			elseif string.sub(key, 1, 1) == '[' then
 				key = tonumber(string.sub(key, 2, -2))
 				if key == nil then error('failed to convert number') end
 			end
 --			print('got key: ', key)
---			if tonumber(name) ~= nil then name = tonumber(name) end
 			
-			local sy = string.sub(stringed_table,p + 1, p + 1)
+			local sy = string.sub(stringed_table, p + 1, p + 1)
 			if sy == '{' then
 				t[key] = {}
 				depth_stack:push(t)
@@ -80,9 +81,9 @@ end
 
 
 
-
+-- converts a table to stringed_table format, returning the string
+-- oblivious to recursive tables, metatables, and functions
 function table_to_stringed_table(tbl)
-	
 	local s = '{'
 	
 	local first = true
@@ -95,8 +96,8 @@ function table_to_stringed_table(tbl)
 		if type(k) == 'number' then
 			s = s .. '[' .. tostring(k) .. ']'
 		elseif type(k) == 'string' then
-			s = s .. k
-			-- s = s .. '["' .. k .. '"]'
+			-- s = s .. k
+			s = s .. '["' .. k .. '"]'
 		else
 			error('unknown type to convert to stringed table: ' .. type(k))
 		end
@@ -120,16 +121,16 @@ end
 
 -- borrowed (slightly modified) from the internet
 function split(str, delim)
-  local out = {}
-  local start = 1
-  local split_start, split_end = string.find(str, delim, start, true)
-  while split_start do
-    table.insert(out, string.sub(str, start, split_start-1))
-    start = split_end + 1
-    split_start, split_end = string.find(str, delim, start, true)
-  end
-  table.insert(out, string.sub(str,start))
-  return out
+	local out = {}
+	local start = 1
+	local split_start, split_end = string.find(str, delim, start, true)
+	while split_start do
+		table.insert(out, string.sub(str, start, split_start-1))
+		start = split_end + 1
+		split_start, split_end = string.find(str, delim, start, true)
+	end
+	table.insert(out, string.sub(str,start))
+	return out
 end
 
 

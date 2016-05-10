@@ -1,6 +1,6 @@
 
 
-require('oop')
+require('./oop')
 
 
 Stack = class {
