@@ -66,27 +66,73 @@ print 'hello world!'
 
 
 
-local asdf = class 'asdf' {
-	_init = function (self)
-		print("asdf is init!")
-	end,
-}
+-- local asdf = class 'asdf' {
+-- 	_init = function (self)
+-- 		print("asdf is init!")
+-- 	end,
+-- }
 
-local foo = class 'foo' {
-	_init = function (self)
-		print("foo is init!")
-	end,
-}
+-- local foo = class 'foo' {
+-- 	_init = function (self)
+-- 		print("foo is init!")
+-- 	end,
+-- }
 
 
-local obj = new 'asdf' ()
-print(obj:isa(asdf))
-print(obj:isa('asdf'))
-print(obj:isa('oop.base_object'))
-print(obj:isa('util.Stack'))
-print(obj:isa('foo'))
+-- local obj = new 'asdf' ()
+-- print(obj:isa(asdf))
+-- print(obj:isa('asdf'))
+-- print(obj:isa('oop.base_object'))
+-- print(obj:isa('util.Stack'))
+-- print(obj:isa('foo'))
 -- print(obj:isa('nope'))
 
 -- for k, v in pairs(class_registry) do
 -- 	print(k, v)
 -- end
+
+
+
+
+TestSuite = class 'test.TestSuite' {
+	_init = function (self, name)
+		self.results = {}
+		self.failed = false
+		self.name = name or "test suite"
+	end,
+	test = function (self, val1, val2)
+		local result = val1 == val2
+		self.results[#self.results + 1] = result
+
+		if not result then
+			self.failed = true
+			print("test #" .. tostring(#self.results) .. " failed of " .. self.name)
+		end
+	end,
+	count_failed = function (self)
+		local failed = 0
+		for i, v in ipairs(self.results) do
+			if not v then
+				failed = failed + 1
+			end
+		end
+		return failed
+	end,
+	is_successful = function (self)
+		return not self.failed
+	end,
+	finish = function (self)
+		print(tostring(#self.results - self:count_failed()) .. "/" .. tostring(#self.results) .. " successful of " .. self.name)
+	end,
+}
+
+
+local tests = new 'test.TestSuite' ('expirements')
+
+print(isa(tests, TestSuite))
+tests:test(1, 1)
+tests:test(false, true)
+tests:test({}, {})
+tests:finish()
+
+
