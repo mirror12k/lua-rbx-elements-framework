@@ -93,6 +93,32 @@ print 'hello world!'
 
 
 
+function compare_tables(t1, t2)
+	for k, v in ipairs(t1) do
+		if v ~= t2[k] then
+			if type(v) == 'table' and type(t2[k]) == 'table' then
+				if compare_tables(v, t2[k]) == false then
+					return false
+				end
+			else
+				return false
+			end
+		end
+	end
+	for k, v in ipairs(t2) do
+		if v ~= t1[k] then
+			if type(v) == 'table' and type(t1[k]) == 'table' then
+				if compare_tables(v, t1[k]) == false then
+					return false
+				end
+			else
+				return false
+			end
+		end
+	end
+	return true
+end
+
 
 TestSuite = class 'test.TestSuite' {
 	_init = function (self, name)
@@ -100,14 +126,26 @@ TestSuite = class 'test.TestSuite' {
 		self.failed = false
 		self.name = name or "test suite"
 	end,
-	test = function (self, val1, val2)
-		local result = val1 == val2
+	result = function (self, result)
 		self.results[#self.results + 1] = result
 
 		if not result then
 			self.failed = true
 			print("test #" .. tostring(#self.results) .. " failed of " .. self.name)
 		end
+		return result
+	end,
+	compare = function (self, val1, val2)
+		if val1 == val2 then
+			return true
+		elseif type(val1) == 'table' and type(val2) == 'table' then
+			return compare_tables(val1, val2)
+		else
+			return false
+		end
+	end,
+	test = function (self, val1, val2)
+		return self:result(self:compare(val1, val2))
 	end,
 	count_failed = function (self)
 		local failed = 0
@@ -134,5 +172,21 @@ tests:test(1, 1)
 tests:test(false, true)
 tests:test({}, {})
 tests:finish()
+
+
+
+-- print(compare_tables({}, {}))
+-- print(compare_tables({}, {1, 4}))
+-- print(compare_tables({1, 2}, {1, 2}))
+-- print(compare_tables({1, 'asdf'}, {1, 'asdf'}))
+-- print(compare_tables({ {1, 2}, 'asdf', {3, 4}}, { {1, 2}, 'asdf', {3, 4}}))
+-- print(compare_tables({ {1, 2}, 'asdf', {3, 5}}, { {1, 2}, 'asdf', {3, 4}}))
+-- print(compare_tables({ {1, 2}, 'asdf', {3, 4}}, { {0, 2}, 'asdf', {3, 4}}))
+
+
+
+
+
+
 
 
