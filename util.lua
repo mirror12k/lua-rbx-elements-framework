@@ -3,7 +3,7 @@
 require('./oop')
 
 
-Stack = class {
+Stack = class 'util.Stack' {
 	_init = function (self)
 		Stack.super._init(self)
 		self.length = 0

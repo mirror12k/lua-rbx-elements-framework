@@ -58,9 +58,35 @@ print 'hello world!'
 
 
 
-print_table(list_delta {1, 2, 5, 4, 1, 0})
-print_table(list_integral {1, 2, 5, 4, 1, 0})
-print_table(list_delta(list_integral {1, 2, 5, 4, 1, 0}))
-print_table(list_integral(list_delta {1, 2, 5, 4, 1, 0}))
+-- print_table(list_delta {1, 2, 5, 4, 1, 0})
+-- print_table(list_integral {1, 2, 5, 4, 1, 0})
+-- print_table(list_delta(list_integral {1, 2, 5, 4, 1, 0}))
+-- print_table(list_integral(list_delta {1, 2, 5, 4, 1, 0}))
 
 
+
+
+local asdf = class 'asdf' {
+	_init = function (self)
+		print("asdf is init!")
+	end,
+}
+
+local foo = class 'foo' {
+	_init = function (self)
+		print("foo is init!")
+	end,
+}
+
+
+local obj = new 'asdf' ()
+print(obj:isa(asdf))
+print(obj:isa('asdf'))
+print(obj:isa('oop.base_object'))
+print(obj:isa('util.Stack'))
+print(obj:isa('foo'))
+-- print(obj:isa('nope'))
+
+-- for k, v in pairs(class_registry) do
+-- 	print(k, v)
+-- end
