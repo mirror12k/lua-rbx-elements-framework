@@ -3,6 +3,7 @@ require('./util')
 require('./oop')
 require('./stringy')
 require('./debug')
+require('./math')
 
 print 'hello world!'
 
@@ -43,10 +44,10 @@ print 'hello world!'
 -- print(isa(obj, nil))
 
 
-print(table_to_stringed_table({1, 2, 3, 4, ['asdf'] = 'qwerty'}))
-
 -- print_table({1, 5, {'a', 'b'}})
-print_table(stringed_table_to_table '{[1]=1,[2]=2,[3]=3,[4]=4,["asdf lol"]="qwerty"}')
+
+-- print(table_to_stringed_table({1, 2, 3, 4, ['asdf'] = 'qwerty'}))
+-- print_table(stringed_table_to_table '{[1]=1,[2]=2,[3]=3,[4]=4,["asdf lol"]="qwerty"}')
 
 -- local stk = Stack.new()
 -- stk:push('asdf'):push('qwerty'):push(15)
@@ -55,5 +56,11 @@ print_table(stringed_table_to_table '{[1]=1,[2]=2,[3]=3,[4]=4,["asdf lol"]="qwer
 -- print(stk:pop())
 -- print(stk:pop())
 
+
+
+print_table(list_delta {1, 2, 5, 4, 1, 0})
+print_table(list_integral {1, 2, 5, 4, 1, 0})
+print_table(list_delta(list_integral {1, 2, 5, 4, 1, 0}))
+print_table(list_integral(list_delta {1, 2, 5, 4, 1, 0}))
 
 
