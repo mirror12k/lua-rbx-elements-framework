@@ -28,3 +28,45 @@ Stack = class 'util.Stack' {
 	
 }
 
+
+
+
+-- borrowed from some programming lua book
+function iter_table(t)
+	local i = 0
+	local n = table.getn(t)
+	return function ()
+		i = i + 1
+		if i <= n then return t[i] end
+	end
+end
+
+
+
+
+-- performs shallow copy of table
+function copy_table(t)
+	local tc = {}
+	for k,v in pairs(t) do
+		tc[k] = v
+	end
+	return tc
+end
+
+-- performs deep copies of tables
+-- oblivious to recursive tables, metatables, and none-primitive keys
+function deep_copy_table(t)
+	local tc = {}
+	for k,v in pairs(t) do
+		if type(v) == 'table' then
+			tc[k] = deep_copy_table(v)
+		else
+			tc[k] = v
+		end
+	end
+	return tc
+end
+
+
+
+
