@@ -8,8 +8,12 @@ if script ~= nil then
 	end
 else
 	-- mostly taken from https://stackoverflow.com/questions/9145432/load-lua-files-by-relative-path
-	local folderOfThisFile = ((...) == nil and './') or (...):match("(.-)[^%/]+$")
-	import = function (name, arg) return require(folderOfThisFile .. name)(arg) end
+	local location = ((...) == nil and './') or (...):match("(.-)[^%/]+$")
+	import = function (name, arg)
+		local target = location .. name
+		while string.match(target, '/[^/]+/../') do target = string.gsub(target, '/[^/]+/../', '/') end
+		return require(target)(arg)
+	end
 end
 
 

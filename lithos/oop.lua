@@ -8,8 +8,12 @@ if script ~= nil then
 	end
 else
 	-- mostly taken from https://stackoverflow.com/questions/9145432/load-lua-files-by-relative-path
-	local folderOfThisFile = ((...) == nil and './') or (...):match("(.-)[^%/]+$")
-	import = function (name, arg) return require(folderOfThisFile .. name)(arg) end
+	local location = ((...) == nil and './') or (...):match("(.-)[^%/]+$")
+	import = function (name, arg)
+		local target = location .. name
+		while string.match(target, '/[^/]+/../') do target = string.gsub(target, '/[^/]+/../', '/') end
+		return require(target)(arg)
+	end
 end
 
 import 'module'
@@ -136,6 +140,12 @@ class_registry['oop.base_object'] = base_object
 local function class (definition)
 	if type(definition) == 'table' then
 		local parent = definition._extends or base_object
+		if type(parent) == 'string' then
+			if class_registry[parent] == nil then
+				error("attempt to extend non-existent class '" .. parent .. "'")
+			end
+			parent = class_registry[parent]
+		end
 		return parent:_subclass(definition)
 	else
 		if class_registry[definition] ~= nil then

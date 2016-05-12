@@ -8,8 +8,12 @@ if script ~= nil then
 	end
 else
 	-- mostly taken from https://stackoverflow.com/questions/9145432/load-lua-files-by-relative-path
-	local folderOfThisFile = ((...) == nil and './') or (...):match("(.-)[^%/]+$")
-	import = function (name, arg) return require(folderOfThisFile .. name)(arg) end
+	local location = ((...) == nil and './') or (...):match("(.-)[^%/]+$")
+	import = function (name, arg)
+		local target = location .. name
+		while string.match(target, '/[^/]+/../') do target = string.gsub(target, '/[^/]+/../', '/') end
+		return require(target)(arg)
+	end
 end
 
 
@@ -19,7 +23,7 @@ import 'oop'
 
 
 local Stack
-Stack = class 'util.Stack' {
+Stack = class 'lithos.Stack' {
 	_init = function (self)
 		Stack.super._init(self)
 		self.length = 0
@@ -113,6 +117,13 @@ function compare_tables(t1, t2)
 end
 
 
+function table_append(t1, t2)
+	for k, v in pairs(t2) do
+		t1[k] = v
+	end
+end
+
+
 
 return export {
 	Stack = Stack,
@@ -121,5 +132,6 @@ return export {
 	deep_copy_table = deep_copy_table,
 	qw = qw,
 	compare_tables = compare_tables,
+	table_append = table_append, 
 }
 
