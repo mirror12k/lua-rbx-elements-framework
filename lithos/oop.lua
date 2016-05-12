@@ -1,7 +1,19 @@
 
+local import
+if script ~= nil then
+	import = function (name)
+		local target = script.Parent
+		string.gsub(name, "([^/]+)", function(s) if s == '..' then target = target.Parent else target = target[s] end end)
+		require(target)()
+	end
+else
+	-- mostly taken from https://stackoverflow.com/questions/9145432/load-lua-files-by-relative-path
+	local folderOfThisFile = ((...) == nil and './') or (...):match("(.-)[^%/]+$")
+	import = function (name) require(folderOfThisFile .. name)() end
+end
 
-
--- import 'Stringy'
+import 'module'
+-- import 'stringy'
 
 
 
@@ -9,9 +21,9 @@
 	to call super methods, refer to your own class and index .super (do not use self.super, it will be misleading)
 ]]
 
-class_registry = {}
+local class_registry = {}
 
-base_object = {
+local base_object = {
 	-- internal function which blesses a new instance of an object
 	-- don't call this, call 'bless' instead which is a non-objective alias of _bless
 	_bless = function (self, t, ...)
@@ -121,7 +133,7 @@ base_object.__index = base_object
 class_registry['oop.base_object'] = base_object
 
 -- instantiates a new class definition
-function class (definition)
+local function class (definition)
 	if type(definition) == 'table' then
 		local parent = definition._extends or base_object
 		return parent:_subclass(definition)
@@ -138,7 +150,7 @@ function class (definition)
 end
 
 -- returns true if the object is an instance or subclass of the given class
-function isa (obj, class)
+local function isa (obj, class)
 	if type(obj) == 'table' and type(obj._isa) == 'function' then
 		return obj:_isa(class)
 	end
@@ -146,7 +158,7 @@ function isa (obj, class)
 end
 
 -- instantiates a new class by name alone from the class registry
-function new (class_name)
+local function new (class_name)
 	if class_registry[class_name] == nil then
 		error("attempt to instantiate non-existent class '" .. class_name .. "'")
 	end
@@ -156,84 +168,14 @@ function new (class_name)
 end
 
 
--- -- example code
-
--- testobj = class {}
 
 
 
--- point = class {
--- 	_init = function (self,x,y)
--- 		point.super._init(self)
--- 		self.x = x or 0
--- 		self.y = y or 0
--- 	end,
--- 	__tostring = function (self)
--- 		return '('..tostring(self.x)..','..tostring(self.y)..')'
--- 	end,
--- 	__add = function (self, other)
--- 		return point(self.x + other.x, self.y + other.y)
--- 	end,
--- 	__sub = function (self, other)
--- 		return point(self.x - other.x, self.y - other.y)
--- 	end,
--- 	__mul = function (self, other)
--- 		if isa(other, point) then return point(self.x * other.x, self.y * other.y) end
--- 		return point(self.x * other, self.y * other)
--- 	end,
--- 	__div = function (self, other)
--- 		if isa(other, point) then return point(self.x / other.x, self.y / other.y) end
--- 		return point(self.x / other, self.y / other)
--- 	end,
--- 	__mod = function (self, other)
--- 		return point(self.x % other.x, self.y % other.y)
--- 	end,
--- 	__unm = function (self)
--- 		return point(-self.x, -self.y)
--- 	end,
--- 	__eq = function (self, other)
--- 		return self.x == other.x and self.y == other.y
--- 	end,
--- 	dist = function (self)
--- 		return (self.x ^ 2 + self.y ^ 2) ^ 0.5
--- 	end,
--- 	normal = function (self)
--- 		return self / self:dist()
--- 	end,
--- }
-
-
-
-
--- superpoint = class {
--- 	_extends = point,
--- 	_init = function (self, ...)
--- 		superpoint.super._init(self, ...)
--- 		self.x = self.x * 10
--- 		self.y = self.y * 10
--- 	end,
--- }
-
-
-
-
--- p = point(6,8)
--- print('p:', p)
-
--- p2 = superpoint(5,13)
--- print('p2:', p2)
-
--- print(p2 - p)
--- print(-p)
--- print(-p == point(-5,-13))
--- print(p:dist())
--- print(p:normal())
--- print(p:normal():dist())
-
-
-
-
-
+return export {
+	class = class,
+	isa = isa,
+	new = new,
+}
 
 
 

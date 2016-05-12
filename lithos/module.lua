@@ -1,7 +1,7 @@
 
 
 
-
+local export
 
 -- lua 5.2 dropped getfenv
 -- this is a workaround using the debug library
@@ -18,18 +18,31 @@ if getfenv == nil then
 	return nil end
 
 	function getfenv (f) return(select(2, findenv(f)) or _G) end
-end
 
-
-function export(export_list)
-	local this
-	this = function ()
-		local env = getfenv(this)
-		for k, v in pairs(export_list) do
-			env[k] = v
+	export = function (export_list)
+		local this
+		this = function ()
+			local env = getfenv(this)
+			for k, v in pairs(export_list) do
+				env[k] = v
+			end
 		end
+		return this
 	end
-	return this
+else
+	export = function (export_list)
+		local this
+		this = function ()
+			local env = getfenv(0)
+			for k, v in pairs(export_list) do
+				env[k] = v
+			end
+		end
+		return this
+	end
 end
 
-return export({ export = export, lol = 'test' })
+
+return export {
+	export = export,
+}

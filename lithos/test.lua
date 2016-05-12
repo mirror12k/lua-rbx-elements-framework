@@ -1,61 +1,32 @@
 
+local import
 if script ~= nil then
-	function import (name)
+	import = function (name)
 		local target = script.Parent
-		string.gsub(name, "([^/]+)", function(s) target = target[s] end)
+		string.gsub(name, "([^/]+)", function(s) if s == '..' then target = target.Parent else target = target[s] end end)
 		require(target)()
 	end
 else
-	function import (name) require('./' .. name)() end
+	-- mostly taken from https://stackoverflow.com/questions/9145432/load-lua-files-by-relative-path
+	local folderOfThisFile = ((...) == nil and './') or (...):match("(.-)[^%/]+$")
+	import = function (name) require(folderOfThisFile .. name)() end
 end
 
 
-require('./util')
-require('./oop')
-require('./stringy')
-require('./debug')
-require('./math')
--- print(require('./module'))
 import 'module'
 
-print(export)
-print(lol)
-
-print 'hello world!'
-
-
-
+import 'util'
+import 'oop'
+import 'stringy'
+import 'debug'
+import 'math'
 
 
 
 
-function compare_tables(t1, t2)
-	for k, v in ipairs(t1) do
-		if v ~= t2[k] then
-			if type(v) == 'table' and type(t2[k]) == 'table' then
-				if compare_tables(v, t2[k]) == false then
-					return false
-				end
-			else
-				return false
-			end
-		end
-	end
-	for k, v in ipairs(t2) do
-		if v ~= t1[k] then
-			if type(v) == 'table' and type(t1[k]) == 'table' then
-				if compare_tables(v, t1[k]) == false then
-					return false
-				end
-			else
-				return false
-			end
-		end
-	end
-	return true
-end
 
 
+local TestSuite
 TestSuite = class 'test.TestSuite' {
 	_init = function (self, name)
 		self.results = {}
@@ -120,4 +91,6 @@ TestSuite = class 'test.TestSuite' {
 
 
 
-
+return export {
+	TestSuite = TestSuite,
+}

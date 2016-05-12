@@ -1,6 +1,20 @@
 
+local import
+if script ~= nil then
+	import = function (name)
+		local target = script.Parent
+		string.gsub(name, "([^/]+)", function(s) if s == '..' then target = target.Parent else target = target[s] end end)
+		require(target)()
+	end
+else
+	-- mostly taken from https://stackoverflow.com/questions/9145432/load-lua-files-by-relative-path
+	local folderOfThisFile = ((...) == nil and './') or (...):match("(.-)[^%/]+$")
+	import = function (name) require(folderOfThisFile .. name)() end
+end
 
-require('./util')
+
+import 'module'
+import 'util'
 
 --[[
 	stringed tables are a subset of regular tables that lack many advanced table-tools
@@ -12,7 +26,7 @@ require('./util')
 
 
 -- converts a stringed table to a proper table, returns new table
-function stringed_table_to_table(stringed_table)
+local function stringed_table_to_table(stringed_table)
 	if string.sub(stringed_table, 1, 1) ~= '{' then
 		error('malformed stringed table:' .. string.sub(stringed_table, 1, 1))
 	end
@@ -83,7 +97,7 @@ end
 
 -- converts a table to stringed_table format, returning the string
 -- oblivious to recursive tables, metatables, and functions
-function table_to_stringed_table(tbl)
+local function table_to_stringed_table(tbl)
 	local s = '{'
 	
 	local first = true
@@ -120,7 +134,7 @@ end
 
 
 -- borrowed (slightly modified) from the internet
-function split(str, delim)
+local function split(str, delim)
 	local out = {}
 	local start = 1
 	local split_start, split_end = string.find(str, delim, start, true)
@@ -134,3 +148,9 @@ function split(str, delim)
 end
 
 
+
+return export {
+	stringed_table_to_table = stringed_table_to_table,
+	table_to_stringed_table = table_to_stringed_table,
+	split = split,
+}
