@@ -67,6 +67,16 @@ function deep_copy_table(t)
 	return tc
 end
 
+-- whitespace-quoted words
+-- splits a string of words on their whitespace and returns a list
+function qw (s)
+	local result = {}
+	for substr in string.gmatch(s, "%S+") do
+		result[#result + 1] = substr
+	end
+	return result
+end
+
 
 
 

@@ -1,9 +1,25 @@
 
+if script ~= nil then
+	function import (name)
+		local target = script.Parent
+		string.gsub(name, "([^/]+)", function(s) target = target[s] end)
+		require(target)()
+	end
+else
+	function import (name) require('./' .. name)() end
+end
+
+
 require('./util')
 require('./oop')
 require('./stringy')
 require('./debug')
 require('./math')
+-- print(require('./module'))
+import 'module'
+
+print(export)
+print(lol)
 
 print 'hello world!'
 
@@ -87,18 +103,21 @@ TestSuite = class 'test.TestSuite' {
 
 
 
-local tests = new 'test.TestSuite' ('stringy tests')
+-- local tests = new 'test.TestSuite' ('stringy tests')
 
-tests:test(stringed_table_to_table(table_to_stringed_table({15, 13, 11})), {15, 13, 11})
-tests:test(stringed_table_to_table(table_to_stringed_table({15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'})), {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'})
-tests:test(stringed_table_to_table(table_to_stringed_table({{15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}, {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}})),
-		{{15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}, {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}})
-tests:test(stringed_table_to_table(table_to_stringed_table({['as df'] = {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'},
-		['nope lol what'] = {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}})),
-		{['as df'] = {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'},
-		['nope lol what'] = {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}})
+-- tests:test(stringed_table_to_table(table_to_stringed_table({15, 13, 11})), {15, 13, 11})
+-- tests:test(stringed_table_to_table(table_to_stringed_table({15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'})), {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'})
+-- tests:test(stringed_table_to_table(table_to_stringed_table({{15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}, {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}})),
+-- 		{{15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}, {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}})
+-- tests:test(stringed_table_to_table(table_to_stringed_table({['as df'] = {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'},
+-- 		['nope lol what'] = {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}})),
+-- 		{['as df'] = {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'},
+-- 		['nope lol what'] = {15, 13, 11, ['foo'] = 'asdf', ['bar'] = 'qwerty'}})
 
-tests:finish()
+-- tests:finish()
+
+
+
 
 
 
