@@ -1,15 +1,15 @@
 
 local import
 if script ~= nil then
-	import = function (name)
+	import = function (name, arg)
 		local target = script.Parent
 		string.gsub(name, "([^/]+)", function(s) if s == '..' then target = target.Parent else target = target[s] end end)
-		require(target)()
+		return require(target)(arg)
 	end
 else
 	-- mostly taken from https://stackoverflow.com/questions/9145432/load-lua-files-by-relative-path
 	local folderOfThisFile = ((...) == nil and './') or (...):match("(.-)[^%/]+$")
-	import = function (name) require(folderOfThisFile .. name)() end
+	import = function (name, arg) return require(folderOfThisFile .. name)(arg) end
 end
 
 
@@ -145,6 +145,17 @@ local function split(str, delim)
 	end
 	table.insert(out, string.sub(str,start))
 	return out
+end
+
+
+-- whitespace-quoted words
+-- splits a string of words on their whitespace and returns a list
+local function qw (s)
+	local result = {}
+	for substr in string.gmatch(s, "%S+") do
+		result[#result + 1] = substr
+	end
+	return result
 end
 
 

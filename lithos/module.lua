@@ -21,10 +21,14 @@ if getfenv == nil then
 
 	export = function (export_list)
 		local this
-		this = function ()
-			local env = getfenv(this)
-			for k, v in pairs(export_list) do
-				env[k] = v
+		this = function (opt)
+			if opt == nil then
+				local env = getfenv(this)
+				for k, v in pairs(export_list) do
+					env[k] = v
+				end
+			elseif opt == 'import_list' then
+				return export_list
 			end
 		end
 		return this
@@ -32,15 +36,20 @@ if getfenv == nil then
 else
 	export = function (export_list)
 		local this
-		this = function ()
-			local env = getfenv(0)
-			for k, v in pairs(export_list) do
-				env[k] = v
+		this = function (opt)
+			if opt == nil then
+				local env = getfenv(0)
+				for k, v in pairs(export_list) do
+					env[k] = v
+				end
+			elseif opt == 'import_list' then
+				return export_list
 			end
 		end
 		return this
 	end
 end
+
 
 
 return export {

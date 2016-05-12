@@ -12,19 +12,24 @@ else
 	import = function (name, arg) return require(folderOfThisFile .. name)(arg) end
 end
 
+import 'module'
+
+function table:append(t)
+	for k, v in pairs(t) do
+		self[k] = v
+	end
+end
+
+local exports = {}
+table.append(exports, import('debug', 'import_list'))
+table.append(exports, import('math', 'import_list'))
+table.append(exports, import('oop', 'import_list'))
+table.append(exports, import('stringy', 'import_list'))
+table.append(exports, import('test', 'import_list'))
+table.append(exports, import('util', 'import_list'))
+
+table.append(exports, import('module', 'import_list'))
 
 
 
--- import 'lithos/util'
--- import 'lithos/stringy'
--- import 'lithos/test'
-
-import 'lithos/lithos'
-
-
-print(export)
-print(table_to_stringed_table({1, 'asdf', {key = 5}}))
-print(TestSuite)
-print(Stack)
-
-
+return export(exports)
