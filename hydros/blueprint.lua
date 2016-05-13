@@ -20,10 +20,12 @@ end
 
 import '../lithos/lithos'
 
+import 'vector'
+import 'block'
 
-class 'hydros.Blueprint' {
-	_init = function (self, name)
-		self.name = name or 'Model'
+local Blueprint
+Blueprint = class 'hydros.Blueprint' {
+	_init = function (self)
 		self.items = {}
 	end,
 	add = function (self, type, item)
@@ -41,16 +43,30 @@ class 'hydros.Blueprint' {
 }
 
 
-
-class 'hydros.ModelBlueprint' {
+local ModelBlueprint
+ModelBlueprint = class 'hydros.ModelBlueprint' {
 	_extends = 'hydros.Blueprint',
+	_init = function (self, name)
+		ModelBlueprint.super._init(self)
+		self.name = name or 'Model'
+	end,
 	build_self = function (self, opts)
-		print("build self")
-		return 'lol'
+		return block.model(self.name)
+	end,
+	build = function (self, opts)
+		opts = opts or {}
+		opts.cframe = opts.cframe or CFrame.new()
+		return ModelBlueprint.super.build(self, opts)
 	end,
 	build_functions = {
-		test_obj = function (self, model, item, opts)
-			print("build test_obj in model: ", model)
+		part = function (self, model, item, opts)
+			local cf = opts.cframe
+			if item.position ~= nil then cf = cf * CFrame.new(item.position[1], item.position[2], item.position[3]) end
+			if item.rotation ~= nil then cf = cf * vector.angled_cframe(item.rotation) end
+
+			local p = block.block_from_cframe(item.name, item.size, cf)
+			p.Parent = model
+			return p
 		end,
 	},
 }

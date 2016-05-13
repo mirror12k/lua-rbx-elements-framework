@@ -16,35 +16,13 @@ else
 	end
 end
 
+import '../lithos/lithos'
 
--- import 'lithos/util'
--- import 'lithos/stringy'
--- import 'lithos/test'
-
-import 'lithos/lithos'
--- import 'lithos/../lithos/lithos'
-import 'hydros/hydros'
+local exports = {}
+table_append(exports, import('vector', 'import_list'))
+table_append(exports, import('block', 'import_list'))
+table_append(exports, import('blueprint', 'import_list'))
 
 
-print(export)
-print(table_to_stringed_table({1, 'asdf', {key = 5}}))
-print(TestSuite)
-print(Stack)
 
-
-local bp = new 'hydros.ModelBlueprint'()
-bp:add('part', {
-	name = 'testpart',
-	size = {10, 20, 30},	
-})
-bp:add('part', {
-	size = {5, 5, 5},
-	position = {0, 12.5, 0},	
-})
-bp:add('part', {
-	size = {5, 100, 5},
-	position = {0, 50, 0},
-	rotation = {45, 0, 0},	
-})
-
-bp:build().Parent = workspace
+return export(exports)
