@@ -70,13 +70,13 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 			p.Parent = model
 
 			-- additional properties as necessary
-			if item.color then p.BrickColor = BrickColor.new(table_to_color3(item.color)) end
-			if item.shape then p.Shape = item.shape end
-			if item.anchored then p.Anchored = item.anchored end
-			if item.cancollide then p.CanCollide = item.cancollide end
-			if item.friction then p.Friction = item.friction end
-			if item.transparency then p.Transparency = item.transparency end
-			if item.surface then
+			if item.color ~= nil then p.BrickColor = BrickColor.new(table_to_color3(item.color)) end
+			if item.shape ~= nil then p.Shape = item.shape end
+			if item.anchored ~= nil then p.Anchored = item.anchored end
+			if item.cancollide ~= nil then p.CanCollide = item.cancollide end
+			if item.friction ~= nil then p.Friction = item.friction end
+			if item.transparency ~= nil then p.Transparency = item.transparency end
+			if item.surface ~= nil then
 				p.TopSurface = item.surface
 				p.BottomSurface = item.surface
 				p.FrontSurface = item.surface
@@ -87,12 +87,31 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 
 			return p
 		end,
+		value = function (self, model, item, opts)
+			local v = block.value(item.name, item.type, item.value)
+			v.Parent = model
+			return v
+		end,
+		weld = function (self, model, item, opts)
+			local p0, p1 = model, model
+			for _,a in ipairs(split(item.p0, '.')) do p0 = p0[a] end
+			for _,a in ipairs(split(item.p1, '.')) do p1 = p1[a] end
+			
+			if p0 == nil or p1 == nil then
+				error("attempt to weld non-existant parts: '"..item.p0.."' and '"..item.p1.."'")
+			else
+				local w = block.weld(p0, p1, item.name)
+				w.Parent = p0
+				return w
+			end
+		end,
 		model = function (self, model, item, opts)
 			local sub_opts = table_copy(opts)
 			if item.position ~= nil then sub_opts.cframe = sub_opts.cframe * CFrame.new(item.position[1], item.position[2], item.position[3]) end
 			if item.rotation ~= nil then sub_opts.cframe = sub_opts.cframe * vector.angled_cframe(item.rotation) end
 
 			local res = item.model:build(sub_opts)
+			if item.name ~= nil then res.Name = item.name end
 			res.Parent = model
 			return res
 		end,

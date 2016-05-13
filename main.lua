@@ -41,16 +41,38 @@ bp:add('part', {
 local m = new 'hydros.ModelBlueprint' ('sub_model')
 
 m:add('part', {
-	size = {5, 5, 5},
-	position = {0, 12.5, 0},
+	name = 'part1',
+	size = {5, 100, 5},
+	position = {0, 50, 10},
+	rotation = {-45, 0, 0},
+	anchored = false,
 })
 m:add('part', {
 	name = 'special_part',
-	size = {5, 100, 5},
-	position = {0, 50, 0},
+	size = {5, 50, 5},
+	position = {0, 25, -10},
 	rotation = {45, 0, 0},
+	anchored = false,
 })
 
-bp:add('model', { model = m })
+m:add('weld', {
+	p0 = 'part1',
+	p1 = 'special_part',
+})
+
+m:add('value', {
+	type = 'String',
+	value = 'hello world!',
+})
+
+bp:add('model', { model = m, name = 'sm' })
+bp:add('model', { model = m, position = {20, 0, 0}, })
+bp:add('model', { model = m, position = {-20, 0, 0}, })
+
+bp:add('weld', {
+	p0 = 'testpart',
+	p1 = 'sm.special_part',
+})
+
 
 bp:build().Parent = workspace

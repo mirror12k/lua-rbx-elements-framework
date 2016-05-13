@@ -60,7 +60,6 @@ end
 local function model(name)
 	local m = Instance.new('Model')
 	m.Name = name or 'Model'
-	m.Parent = parent
 	return m
 end
 
@@ -83,10 +82,9 @@ local function ungroup(m)
 	)
 end
 
-local function value(name, type, val, parent)
+local function value(name, type, val)
 	local v = Instance.new(type .. 'Value')
 	v.Value = val
-	v.Parent = parent
 	v.Name = name or type .. 'Value'
 	return v
 end
