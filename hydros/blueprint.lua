@@ -60,13 +60,41 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 	end,
 	build_functions = {
 		part = function (self, model, item, opts)
+			-- figure out its cframe
 			local cf = opts.cframe
 			if item.position ~= nil then cf = cf * CFrame.new(item.position[1], item.position[2], item.position[3]) end
 			if item.rotation ~= nil then cf = cf * vector.angled_cframe(item.rotation) end
 
+			-- create it
 			local p = block.block_from_cframe(item.name, item.size, cf)
 			p.Parent = model
+
+			-- additional properties as necessary
+			if item.color then p.BrickColor = BrickColor.new(table_to_color3(item.color)) end
+			if item.shape then p.Shape = item.shape end
+			if item.anchored then p.Anchored = item.anchored end
+			if item.cancollide then p.CanCollide = item.cancollide end
+			if item.friction then p.Friction = item.friction end
+			if item.transparency then p.Transparency = item.transparency end
+			if item.surface then
+				p.TopSurface = item.surface
+				p.BottomSurface = item.surface
+				p.FrontSurface = item.surface
+				p.BackSurface = item.surface
+				p.LeftSurface = item.surface
+				p.RightSurface = item.surface
+			end
+
 			return p
+		end,
+		model = function (self, model, item, opts)
+			local sub_opts = table_copy(opts)
+			if item.position ~= nil then sub_opts.cframe = sub_opts.cframe * CFrame.new(item.position[1], item.position[2], item.position[3]) end
+			if item.rotation ~= nil then sub_opts.cframe = sub_opts.cframe * vector.angled_cframe(item.rotation) end
+
+			local res = item.model:build(sub_opts)
+			res.Parent = model
+			return res
 		end,
 	},
 }

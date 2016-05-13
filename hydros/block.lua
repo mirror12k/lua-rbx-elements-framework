@@ -74,6 +74,15 @@ local function group(name, parts)
 	return m
 end
 
+local function ungroup(m)
+	local parent = m.Parent
+	table.foreachi(m:GetChildren(),
+		function (v)
+			v.Parent = parent
+		end
+	)
+end
+
 local function value(name, type, val, parent)
 	local v = Instance.new(type .. 'Value')
 	v.Value = val

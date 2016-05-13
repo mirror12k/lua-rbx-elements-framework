@@ -65,7 +65,7 @@ end
 
 
 -- performs shallow copy of table
-local function copy_table(t)
+local function table_copy(t)
 	local tc = {}
 	for k,v in pairs(t) do
 		tc[k] = v
@@ -75,11 +75,12 @@ end
 
 -- performs deep copies of tables
 -- oblivious to recursive tables, metatables, and none-primitive keys
-local function deep_copy_table(t)
+local table_deep_copy
+table_deep_copy = function (t)
 	local tc = {}
 	for k,v in pairs(t) do
 		if type(v) == 'table' then
-			tc[k] = deep_copy_table(v)
+			tc[k] = table_deep_copy(v)
 		else
 			tc[k] = v
 		end
@@ -128,8 +129,8 @@ end
 return export {
 	Stack = Stack,
 	iter_table = iter_table,
-	copy_table = copy_table,
-	deep_copy_table = deep_copy_table,
+	table_copy = table_copy,
+	table_deep_copy = table_deep_copy,
 	qw = qw,
 	compare_tables = compare_tables,
 	table_append = table_append, 
