@@ -168,4 +168,5 @@ return export {
 	stringed_table_to_table = stringed_table_to_table,
 	table_to_stringed_table = table_to_stringed_table,
 	split = split,
+	qw = qw,
 }

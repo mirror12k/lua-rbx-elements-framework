@@ -131,7 +131,6 @@ return export {
 	iter_table = iter_table,
 	table_copy = table_copy,
 	table_deep_copy = table_deep_copy,
-	qw = qw,
 	compare_tables = compare_tables,
 	table_append = table_append, 
 }

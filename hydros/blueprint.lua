@@ -84,6 +84,27 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 		end
 		return self:add('model', obj)
 	end,
+	add_weld = function (self, p0, p1, name)
+		if type(p1) == 'string' then
+			return self:add('weld', {
+				p0 = p0,
+				p1 = p1,
+				name = name,
+			})
+		else
+			for _, p in ipairs(p1) do
+				self:add_weld(p0, p, name)
+			end
+			return self
+		end
+	end,
+	add_value = function (self, name, type, value)
+		return self:add({
+			name = name,
+			type = type,
+			value = value,
+		})
+	end,
 	build_functions = {
 		part = function (self, model, item, opts)
 			-- figure out its cframe
