@@ -99,7 +99,7 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 		end
 	end,
 	add_value = function (self, name, type, value)
-		return self:add({
+		return self:add('value', {
 			name = name,
 			type = type,
 			value = value,
@@ -117,7 +117,7 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 			p.Parent = model
 
 			-- additional properties as necessary
-			if item.color ~= nil then p.BrickColor = BrickColor.new(table_to_color3(item.color)) end
+			if item.color ~= nil then p.BrickColor = BrickColor.new(vector.table_to_color3(item.color)) end
 			if item.shape ~= nil then p.Shape = item.shape end
 			if item.anchored ~= nil then p.Anchored = item.anchored end
 			if item.cancollide ~= nil then p.CanCollide = item.cancollide end

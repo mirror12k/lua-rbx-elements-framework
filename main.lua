@@ -44,3 +44,13 @@ bp:add_weld('testpart', qw' center_model.part2 sm1.part1 sm2.part1')
 
 
 bp:build().Parent = workspace
+
+
+local cf = CFrame.new(50, 50, 50)
+local cf2 = cf * vector.angled_cframe({0, 45, 0}) * CFrame.new(20, 0, 0)
+
+draw.cframe(cf)
+draw.cframe(cf2)
+
+draw.line(Vector3.new(), cf.p)
+draw.line(Vector3.new(), cf2.p)
