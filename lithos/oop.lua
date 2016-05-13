@@ -28,6 +28,8 @@ import 'module'
 local class_registry = {}
 
 local base_object = {
+	class_name = 'oop.base_object',
+
 	-- internal function which blesses a new instance of an object
 	-- don't call this, call 'bless' instead which is a non-objective alias of _bless
 	_bless = function (self, t, ...)
@@ -53,18 +55,6 @@ local base_object = {
 		local t = {}
 		setmetatable(t, self):_init(...)
 		return t
-	end,
-	_freeze = function (self)
-		local metatable = getmetatable(self)
-		local s = table_to_stringed_table(setmetatable(self, nil))
-		setmetatable(self, metatable)
-		return s
-	end,
-	freeze = function (self)
-		return self:_freeze()
-	end,
-	_unfreeze = function (self, s)
-		return self:_bless(stringed_table_to_table(s))
 	end,
 	-- internal function which creates a special instance of the class which is it's own class
 	_subclass = function (self, class)
@@ -96,9 +86,6 @@ local base_object = {
 		end
 		class.bless = function (...)
 			return class:_bless(...)
-		end
-		class.unfreeze = function (...)
-			return class:_unfreeze(...)
 		end
 
 		-- invoke static initializer if there is one
@@ -154,6 +141,7 @@ local function class (definition)
 		return function (true_def)
 				local created_class = class(true_def)
 				class_registry[definition] = created_class
+				created_class.class_name = definition
 				return created_class
 			end
 	end
@@ -178,13 +166,16 @@ local function new (class_name)
 end
 
 
-
+local function class_by_name (name)
+	return class_registry[name]
+end
 
 
 return export {
 	class = class,
 	isa = isa,
 	new = new,
+	class_by_name = class_by_name,
 }
 
 

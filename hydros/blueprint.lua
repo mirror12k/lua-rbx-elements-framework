@@ -50,6 +50,13 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 		ModelBlueprint.super._init(self)
 		self.name = name or 'Model'
 	end,
+	_blessed_init = function (self)
+		for _,item in ipairs(self.items) do
+			if item[1] == 'model' then
+				ModelBlueprint.bless(item[2].model)
+			end
+		end
+	end,
 	build_self = function (self, opts)
 		return block.model(self.name)
 	end,

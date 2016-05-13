@@ -17,19 +17,26 @@ else
 end
 
 import 'module'
-import 'util'
-
-local exports = {}
-table_append(exports, import('debug', 'import_list'))
-table_append(exports, import('math', 'import_list'))
-table_append(exports, import('oop', 'import_list'))
-table_append(exports, import('stringy', 'import_list'))
-table_append(exports, import('test', 'import_list'))
-table_append(exports, import('util', 'import_list'))
-table_append(exports, import('freeze', 'import_list'))
-
-table_append(exports, import('module', 'import_list'))
+import 'oop'
+import 'stringy'
 
 
+local function freeze (obj)
+	local metatable = getmetatable(obj)
+	local s = table_to_stringed_table(setmetatable(obj, nil))
+	setmetatable(obj, metatable)
+	return metatable.class_name .. ':' .. s
+end
 
-return export(exports)
+local function thaw (s)
+	local offset = string.find(s, ':')
+	local class_name = string.sub(s, 1, offset - 1)
+	s = string.sub(s, offset + 1)
+	return class_by_name(class_name).bless(stringed_table_to_table(s))
+end
+
+
+return export {
+	freeze = freeze,
+	thaw = thaw,
+}
