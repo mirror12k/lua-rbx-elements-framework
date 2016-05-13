@@ -58,6 +58,32 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 		opts.cframe = opts.cframe or CFrame.new()
 		return ModelBlueprint.super.build(self, opts)
 	end,
+	add_part = function (self, name, size, position, rotation, opts)
+		local obj = {
+			name = name,
+			size = size,
+			position = position,
+			rotation = rotation,
+		}
+		if opts ~= nil then
+			for k, v in pairs(opts) do
+				obj[k] = v
+			end
+		end
+		return self:add('part', obj)
+	end,
+	add_model = function (self, name, model, opts)
+		local obj = {
+			name = name,
+			model = model,
+		}
+		if opts ~= nil then
+			for k, v in pairs(opts) do
+				obj[k] = v
+			end
+		end
+		return self:add('model', obj)
+	end,
 	build_functions = {
 		part = function (self, model, item, opts)
 			-- figure out its cframe
@@ -101,6 +127,19 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 				error("attempt to weld non-existant parts: '"..item.p0.."' and '"..item.p1.."'")
 			else
 				local w = block.weld(p0, p1, item.name)
+				w.Parent = p0
+				return w
+			end
+		end,
+		hinge = function (self, model, item, opts)
+			local p0, p1 = model, model
+			for _,a in ipairs(split(item.p0, '.')) do p0 = p0[a] end
+			for _,a in ipairs(split(item.p1, '.')) do p1 = p1[a] end
+			
+			if p0 == nil or p1 == nil then
+				error("attempt to hinge non-existant parts: '"..item.p0.."' and '"..item.p1.."'")
+			else
+				local w = block.hinge(p0, p1, item.name, item.hinge_type)
 				w.Parent = p0
 				return w
 			end

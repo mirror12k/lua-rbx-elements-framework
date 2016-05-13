@@ -17,47 +17,24 @@ else
 end
 
 
--- import 'lithos/util'
--- import 'lithos/stringy'
--- import 'lithos/test'
 
 import 'lithos/lithos'
--- import 'lithos/../lithos/lithos'
 import 'hydros/hydros'
 
 
--- print(export)
--- print(table_to_stringed_table({1, 'asdf', {key = 5}}))
--- print(TestSuite)
--- print(Stack)
 
 
 local bp = new 'hydros.ModelBlueprint' ('test_model')
-bp:add('part', {
-	name = 'testpart',
-	size = {10, 20, 30},
-})
+bp:add_part('testpart', {10, 20, 30})
 
 local m = new 'hydros.ModelBlueprint' ('sub_model')
 
-m:add('part', {
-	name = 'part1',
-	size = {5, 100, 5},
-	position = {0, 50, 10},
-	rotation = {-45, 0, 0},
-	anchored = false,
-})
-m:add('part', {
-	name = 'special_part',
-	size = {5, 50, 5},
-	position = {0, 25, -10},
-	rotation = {45, 0, 0},
-	anchored = false,
-})
+m:add_part('part1', {5, 100, 5}, {0, 50, 10}, {-45, 0, 0}, { anchored = false, })
+m:add_part('part2', {5, 50, 5}, {0, 25, -10}, {45, 0, 0}, { anchored = false, })
 
 m:add('weld', {
 	p0 = 'part1',
-	p1 = 'special_part',
+	p1 = 'part2',
 })
 
 m:add('value', {
@@ -65,13 +42,13 @@ m:add('value', {
 	value = 'hello world!',
 })
 
-bp:add('model', { model = m, name = 'sm' })
-bp:add('model', { model = m, position = {20, 0, 0}, })
-bp:add('model', { model = m, position = {-20, 0, 0}, })
+bp:add_model('center_model', m)
+bp:add_model('sm1', m, { position = {70, 0, 0}, rotation = {0, 0, 45}, })
+bp:add_model('sm2', m, { position = {-70, 0, 0}, rotation = {0, 0, -45}, })
 
 bp:add('weld', {
 	p0 = 'testpart',
-	p1 = 'sm.special_part',
+	p1 = 'center_model.part2',
 })
 
 
