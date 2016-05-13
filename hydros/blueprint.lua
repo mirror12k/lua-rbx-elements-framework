@@ -33,14 +33,26 @@ Blueprint = class 'hydros.Blueprint' {
 		return self
 	end,
 	build = function (self, options)
+		options = options or {}
 		local obj = self:build_self(options)
-		for _, item in pairs(self.items) do
+		for _, item in ipairs(self.items) do
 			self.build_functions[item[1]](self, obj, item[2], options)
 		end
 		return obj
 	end,
+	compile = function (self, options)
+		options = options or {}
+		for _, item in ipairs(self.items) do
+			self.compile_functions[item[1]](self, item[2], options)
+		end
+	end,
 	build_functions = {},
+	compile_functions = {},
 }
+
+
+
+
 
 
 local ModelBlueprint
@@ -59,11 +71,6 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 	end,
 	build_self = function (self, opts)
 		return block.model(self.name)
-	end,
-	build = function (self, opts)
-		opts = opts or {}
-		opts.cframe = opts.cframe or CFrame.new()
-		return ModelBlueprint.super.build(self, opts)
 	end,
 	add_part = function (self, name, size, position, rotation, opts)
 		local obj = {
@@ -115,7 +122,7 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 	build_functions = {
 		part = function (self, model, item, opts)
 			-- figure out its cframe
-			local cf = opts.cframe
+			local cf = opts.cframe or CFrame.new()
 			if item.position ~= nil then cf = cf * CFrame.new(item.position[1], item.position[2], item.position[3]) end
 			if item.rotation ~= nil then cf = cf * vector.angled_cframe(item.rotation) end
 
@@ -174,6 +181,7 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 		end,
 		model = function (self, model, item, opts)
 			local sub_opts = table_copy(opts)
+			sub_opts.cframe = sub_opts.cframe or CFrame.new()
 			if item.position ~= nil then sub_opts.cframe = sub_opts.cframe * CFrame.new(item.position[1], item.position[2], item.position[3]) end
 			if item.rotation ~= nil then sub_opts.cframe = sub_opts.cframe * vector.angled_cframe(item.rotation) end
 
@@ -183,6 +191,38 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 			return res
 		end,
 	},
+
+
+	-- static method meant to be used to create
+	generate_from_model = function (self, model)
+		local bp = self.new(model.Name)
+		for _,v in pairs(model:GetChildren()) do
+			if v:IsA('Part') then
+				local opts = {
+					color = vector.color3_to_table(v.BrickColor.Color),
+					anchored = v.Anchored,
+					cancollide = v.CanCollide,
+				}
+				if v.Transparency ~= 0 then opts.transparency = v.Transparency end
+				if 
+						v.TopSurface == v.BottomSurface and
+						v.TopSurface == v.FrontSurface and
+						v.TopSurface == v.BackSurface and
+						v.TopSurface == v.LeftSurface and
+						v.TopSurface == v.RightSurface and
+						v.TopSurface ~= Enum.SurfaceType.Smooth
+						then
+					opts.surface = v.TopSurface.Value
+				end
+
+				bp:add_part(v.Name, vector.vector3_to_table(v.Size), vector.vector3_to_table(v.Position), vector.vector3_to_table(v.Rotation), opts)
+			elseif v:IsA('Model') then
+				bp:add_model(nil, self:generate_from_model(v))
+			end
+		end
+		return bp
+
+	end,
 }
 
 
