@@ -42,8 +42,14 @@ Blueprint = class 'hydros.Blueprint' {
 	end,
 	compile = function (self, options)
 		options = options or {}
-		for _, item in ipairs(self.items) do
-			self.compile_functions[item[1]](self, item[2], options)
+		local old_items = self.items
+		self.items = {}
+		for _, item in ipairs(old_items) do
+			if self.compile_functions[item[1]] ~= nil then
+				self.compile_functions[item[1]](self, item[2], options)
+			else
+				self:add(item[1], item[2])
+			end
 		end
 	end,
 	build_functions = {},
