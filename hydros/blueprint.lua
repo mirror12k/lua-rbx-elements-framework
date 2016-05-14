@@ -40,20 +40,7 @@ Blueprint = class 'hydros.Blueprint' {
 		end
 		return obj
 	end,
-	compile = function (self, options)
-		options = options or {}
-		local old_items = self.items
-		self.items = {}
-		for _, item in ipairs(old_items) do
-			if self.compile_functions[item[1]] ~= nil then
-				self.compile_functions[item[1]](self, item[2], options)
-			else
-				self:add(item[1], item[2])
-			end
-		end
-	end,
 	build_functions = {},
-	compile_functions = {},
 }
 
 
@@ -64,6 +51,7 @@ Blueprint = class 'hydros.Blueprint' {
 local ModelBlueprint
 ModelBlueprint = class 'hydros.ModelBlueprint' {
 	_extends = 'hydros.Blueprint',
+
 	_init = function (self, name)
 		ModelBlueprint.super._init(self)
 		self.name = name or 'Model'
@@ -75,6 +63,7 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 			end
 		end
 	end,
+
 	build_self = function (self, opts)
 		return block.model(self.name)
 	end,
@@ -247,6 +236,54 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 	end,
 }
 
+
+
+local CompiledBlueprint
+CompiledBlueprint = class 'hydros.CompiledBlueprint' {
+	_extends = 'hydros.ModelBlueprint',
+
+	compile_self = function (self, options)
+		return new 'hydros.ModelBlueprint' (self.name)
+	end,
+	-- syntactic sugar for when calling :compile is a hassle
+	build = function (self, options)
+		local bp = self:compile()
+		return bp:build(options)
+	end,
+	-- compiles all items inside of it to a new blueprint
+	-- any items that don't have an associated compile function will be simply :add'd to the resulting blueprint
+	compile = function (self, options)
+		options = options or {}
+		local obj = self:compile_self(options)
+		for _, item in ipairs(self.items) do
+			if self.compile_functions[item[1]] ~= nil then
+				self.compile_functions[item[1]](self, obj, item[2], options)
+			else
+				obj:add(item[1], item[2])
+			end
+		end
+		return obj
+	end,
+	-- adds a blueprint to the items which will be compiled during compile time
+	-- the result will be added as a model
+	-- blueprints that shouldn't be compiled must be added with add_model
+	add_blueprint = function (self, blueprint, name, opts)
+		return self:add('blueprint', {
+			blueprint = blueprint,
+			name = name,
+			opts = opts,
+		})
+	end,
+
+
+	-- the compile functions for items by name
+	compile_functions = {
+		-- compile function to compile a sub-blueprint
+		blueprint = function (self, bp, item, options)
+			bp:add_model(item.name, item.blueprint:compile(), item.opts)
+		end,
+	},
+}
 
 
 

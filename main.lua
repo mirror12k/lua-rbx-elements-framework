@@ -79,6 +79,6 @@ bp:add_street({0, -30}, {0, -600})
 bp:add_street({200, 200}, {-200, -200})
 bp:add_street({200, -400}, {-200, 400})
 
-bp:compile()
+-- bp = bp:compile()
 bp:build({ cframe = CFrame.new(0, 1, 0) }).Parent = workspace
 

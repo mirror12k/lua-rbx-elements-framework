@@ -22,7 +22,7 @@ import '../hydros/hydros'
 
 local StreetBlueprint
 StreetBlueprint = class 'aeros.StreetBlueprint' {
-	_extends = class_by_name 'hydros.ModelBlueprint',
+	_extends = class_by_name 'hydros.CompiledBlueprint',
 
 	add_street = function (self, pstart, pend, opts)
 		opts = opts or {}
@@ -37,10 +37,10 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 			name = opts.name,
 		})
 	end,
-	compile_functions = {
-		street = function (self, item, options)
+	compile_functions = table_append({
+		street = function (self, blueprint, item, options)
 			local angle = math.deg(math.atan2(item.pend[2] - item.pstart[2], item.pend[1] - item.pstart[1]))
-			self:add_part('pavement', {item.length, item.thickness, item.width},
+			blueprint:add_part('pavement', {item.length, item.thickness, item.width},
 				{(item.pstart[1] + item.pend[1]) / 2, - item.thickness / 2, (item.pstart[2] + item.pend[2]) / 2},
 				{0, angle, 0},
 				{
@@ -49,14 +49,14 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 				})
 			local sidewalk_cframe = CFrame.new((item.pstart[1] + item.pend[1]) / 2, item.sidewalk_elevation - item.thickness / 2, (item.pstart[2] + item.pend[2]) / 2)
 				* vector.angled_cframe({0, angle, 0})
-			self:add_part('sidewalk', {item.length, item.thickness, item.sidewalk_width},
+			blueprint:add_part('sidewalk', {item.length, item.thickness, item.sidewalk_width},
 				vector.vector3_to_table((sidewalk_cframe * CFrame.new(0, 0, item.width / 2 + item.sidewalk_width / 2)).p),
 				{0, angle, 0},
 				{
 					color = {0.5, 0.5, 0.5},
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
-			self:add_part('sidewalk', {item.length, item.thickness, item.sidewalk_width},
+			blueprint:add_part('sidewalk', {item.length, item.thickness, item.sidewalk_width},
 				vector.vector3_to_table((sidewalk_cframe * CFrame.new(0, 0, - (item.width / 2 + item.sidewalk_width / 2))).p),
 				{0, angle, 0},
 				{
@@ -64,7 +64,7 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
 		end,
-	}
+	}, class_by_name 'hydros.CompiledBlueprint' .compile_functions),
 }
 
 
