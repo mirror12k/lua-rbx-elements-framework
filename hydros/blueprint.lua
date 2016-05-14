@@ -214,10 +214,26 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 						then
 					opts.surface = v.TopSurface.Value
 				end
-
 				bp:add_part(v.Name, vector.vector3_to_table(v.Size), vector.vector3_to_table(v.Position), vector.vector3_to_table(v.Rotation), opts)
 			elseif v:IsA('Model') then
 				bp:add_model(nil, self:generate_from_model(v))
+			end
+		end
+
+		-- second pass for welds
+		for _,v in pairs(model:GetChildren()) do
+			for _, subv in pairs(v:GetChildren()) do
+				if subv:IsA('Weld') then
+					local p0 = v.Name
+					local p1 = subv.Part1.Name
+
+					local iterp = subv.Part1.Parent
+					while iterp ~= model do
+						p1 = iterp.Name .. '.' .. p1
+						iterp = iterp.Parent
+					end
+					bp:add_weld(p0, p1)
+				end
 			end
 		end
 		return bp

@@ -5,5 +5,5 @@ function import (name) local target = game.ServerScriptService; string.gsub(name
 import 'lithos/lithos'; import 'hydros/hydros'
 
 -- serialize a model
-print (freeze(class_by_name 'hydros.ModelBlueprint' :generate_from_model(model)))
+print (freeze(class_by_name 'hydros.ModelBlueprint' :generate_from_model(workspace.test_model)))
 
