@@ -19,7 +19,7 @@ end
 import '../lithos/lithos'
 
 local exports = {}
-table_append(exports, import('streets', 'import_list'))
+table_append(exports, import('city', 'import_list'))
 
 
 
