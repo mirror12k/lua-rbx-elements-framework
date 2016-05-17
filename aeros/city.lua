@@ -79,13 +79,13 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 		options.thickness = options.thickness or self.thickness or 2
 
 		self:add_wall({position[1] + length / 2 - options.thickness / 2, position[2] + width / 2},
-			{position[1] + length / 2 - options.thickness / 2, position[2] - width / 2}, options)
+			{position[1] + length / 2 - options.thickness / 2, position[2] - width / 2}, options.north_wall)
 		self:add_wall({position[1] -length / 2 + options.thickness / 2, position[2] + width / 2},
-			{position[1] -length / 2 + options.thickness / 2, position[2] - width / 2}, options)
+			{position[1] -length / 2 + options.thickness / 2, position[2] - width / 2}, options.south_wall)
 		self:add_wall({position[1] + length / 2, position[2] + width / 2 - options.thickness / 2},
-			{position[1] -length / 2, position[2] + width / 2 - options.thickness / 2}, options)
+			{position[1] -length / 2, position[2] + width / 2 - options.thickness / 2}, options.east_wall)
 		self:add_wall({position[1] + length / 2, position[2] -width / 2 + options.thickness / 2},
-			{position[1] -length / 2, position[2] -width / 2 + options.thickness / 2}, options)
+			{position[1] -length / 2, position[2] -width / 2 + options.thickness / 2}, options.west_wall)
 		-- add_floor()
 	end,
 	add_wall = function (self, pstart, pend, options)
@@ -110,13 +110,23 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 
 	compile_functions = table_append({
 		wall = function (self, blueprint, item, options)
-			blueprint:add_part('wall', {item.length, item.height, item.thickness},
-				{(item.pstart[1] + item.pend[1]) / 2, item.height / 2, (item.pstart[2] + item.pend[2]) / 2},
-				{0, item.angle, 0},
-				{
-					-- color = {0, 0, 0},
-					-- surface = Enum.SurfaceType.SmoothNoOutlines,
-				})
+			local sections = {item}
+
+			for _, hole in ipairs(item.holes) do
+				local target = 0
+				for i = 1, #sections do
+					-- if sections[i].
+				end
+			end
+
+			for _, item in ipairs(sections) do
+				blueprint:add_part('wall', {item.length, item.height, item.thickness},
+					{(item.pstart[1] + item.pend[1]) / 2, item.height / 2, (item.pstart[2] + item.pend[2]) / 2},
+					{0, item.angle, 0},
+					{
+						surface = Enum.SurfaceType.SmoothNoOutlines,
+					})
+			end
 		end,
 		floor = function (self, blueprint, item, options)
 			blueprint:add_part('wall', item.size,

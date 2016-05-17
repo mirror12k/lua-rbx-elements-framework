@@ -86,8 +86,8 @@ local bp = new 'aeros.RoomBlueprint' ()
 -- bp:add_wall({10, -9}, {-10, -9})
 -- bp:add_floor({20, 2, 20}, {0, 11, 0}, 0, {-10, -9})
 
-bp:add_room({0, 0}, 20, 20)
-bp:add_room({10, 20}, 40, 20)
-bp:add_room({10, 40}, 40, 20)
+bp:add_room({0, 0, north_wall = { holes = { 4, 4 }}}, 20, 20)
+bp:add_room({10, 18}, 40, 20)
+bp:add_room({10, 36}, 40, 20)
 
 bp:build().Parent = workspace
