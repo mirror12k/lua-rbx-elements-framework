@@ -94,9 +94,14 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 			pstart = pstart,
 			pend = pend,
 			length = math.sqrt(math.abs(pstart[1] - pend[1])^2 + math.abs(pstart[2] - pend[2])^2),
-			angle = math.deg(math.atan2(pend[2] - pstart[2], pend[1] - pstart[1])),
+			-- i honestly have no clue what the 180 - ... is for
+			-- it just worked properly for a while, and then started mirroring since the new sectioned wall creation
+			-- and this mirroring reverses the new mirroring.
+			-- though i'd still love to know why the mirroring is happening in the first place, cause i don't remember changing anything about the angling code
+			angle = 180 - math.deg(math.atan2(pend[2] - pstart[2], pend[1] - pstart[1])),
 			height = options.height or self.height or 12,
 			thickness = options.thickness or self.thickness or 2,
+			holes = options.holes,
 		})
 	end,
 	add_floor = function (self, size, position, rotation, options)
@@ -110,18 +115,50 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 
 	compile_functions = table_append({
 		wall = function (self, blueprint, item, options)
-			local sections = {item}
+			local length = item.length
+			local pstart = item.pstart
+			local pdelta = { item.pend[1] - item.pstart[1], item.pend[2] - item.pstart[2] }
+			local sections = {{ offset = 0, length = 1 }}
 
-			for _, hole in ipairs(item.holes) do
-				local target = 0
-				for i = 1, #sections do
-					-- if sections[i].
+			if item.holes ~= nil then
+				for _, hole in ipairs(item.holes) do
+					local target = -1
+					for i, v in ipairs(sections) do
+						if v.offset <= hole.position and v.offset + v.length > hole.position then
+							if hole.length + hole.position > v.offset + v.length then
+								error('invalid hole: ' .. tostring(hole.position) .. ' - ' .. tostring(hole.length))
+							end
+							target = i
+							break
+						end
+					end
+
+					if target == -1 then
+						error('hole out of bounds: ' .. tostring(hole.position) .. ' - ' .. tostring(hole.length))
+					end
+
+					local sec = table.remove(sections, target)
+					if sec.offset == hole.position then
+						if sec.length == hole.length then
+							-- do nothing to delete the section
+						else
+							table.insert(sections, target, { offset = sec.offset + hole.length, length = sec.length - hole.length })
+						end
+					else
+						if sec.length == hole.position + hole.length then
+							table.insert(sections, target, { offset = sec.offset, length = hole.position - sec.offset })
+						else
+							table.insert(sections, target, { offset = hole.position + hole.length, length = (sec.length + sec.offset) - (hole.length + hole.position) })
+							table.insert(sections, target, { offset = sec.offset, length = hole.position - sec.offset })
+						end
+					end
+
 				end
 			end
 
-			for _, item in ipairs(sections) do
-				blueprint:add_part('wall', {item.length, item.height, item.thickness},
-					{(item.pstart[1] + item.pend[1]) / 2, item.height / 2, (item.pstart[2] + item.pend[2]) / 2},
+			for _, sec in ipairs(sections) do
+				blueprint:add_part('wall', {sec.length * item.length, item.height, item.thickness},
+					{ pstart[1] + pdelta[1] * (sec.offset + sec.length / 2), item.height / 2, pstart[2] + pdelta[2] * (sec.offset + sec.length / 2)},
 					{0, item.angle, 0},
 					{
 						surface = Enum.SurfaceType.SmoothNoOutlines,
