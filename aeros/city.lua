@@ -47,8 +47,11 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 					color = {0, 0, 0},
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
-			local sidewalk_cframe = CFrame.new((item.pstart[1] + item.pend[1]) / 2, item.sidewalk_elevation - item.thickness / 2, (item.pstart[2] + item.pend[2]) / 2)
-				* vector.angled_cframe({0, item.angle, 0})
+			local sidewalk_cframe = CFrame.new(
+					(item.pstart[1] + item.pend[1]) / 2,
+					item.sidewalk_elevation - item.thickness / 2,
+					(item.pstart[2] + item.pend[2]) / 2
+				) * vector.angled_cframe({0, item.angle, 0})
 			blueprint:add_part('sidewalk', {item.length, item.thickness, item.sidewalk_width},
 				vector.vector3_to_table((sidewalk_cframe * CFrame.new(0, 0, item.width / 2 + item.sidewalk_width / 2)).p),
 				{0, item.angle, 0},
@@ -118,13 +121,14 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 			local length = item.length
 			local pstart = item.pstart
 			local pdelta = { item.pend[1] - item.pstart[1], item.pend[2] - item.pstart[2] }
-			local sections = {{ offset = 0, length = 1 }}
+			local sections = {{ offset = 0, length = 1, elevation = 0, height = 1 }}
 
 			if item.holes ~= nil then
 				for _, hole in ipairs(item.holes) do
 					local target = -1
 					for i, v in ipairs(sections) do
-						if v.offset <= hole.position and v.offset + v.length > hole.position then
+						if v.offset <= hole.position and v.offset + v.length > hole.position and
+								(hole.elevation == nil and hole.height == nil or v.elevation <= hole.elevation and v.elevation + v.height > hole.elevation) then
 							if hole.length + hole.position > v.offset + v.length then
 								error('invalid hole: ' .. tostring(hole.position) .. ' - ' .. tostring(hole.length))
 							end
@@ -137,19 +141,78 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 						error('hole out of bounds: ' .. tostring(hole.position) .. ' - ' .. tostring(hole.length))
 					end
 
+					-- calculate the before and after pieces of wall
 					local sec = table.remove(sections, target)
 					if sec.offset == hole.position then
 						if sec.length == hole.length then
 							-- do nothing to delete the section
 						else
-							table.insert(sections, target, { offset = sec.offset + hole.length, length = sec.length - hole.length })
+							table.insert(sections, target, {
+								offset = sec.offset + hole.length,
+								length = sec.length - hole.length,
+								elevation = sec.elevation,
+								height = sec.height,
+							})
 						end
 					else
-						if sec.length == hole.position + hole.length then
-							table.insert(sections, target, { offset = sec.offset, length = hole.position - sec.offset })
+						if sec.offset + sec.length == hole.position + hole.length then
+							table.insert(sections, target, {
+								offset = sec.offset,
+								length = hole.position - sec.offset,
+								elevation = sec.elevation,
+								height = sec.height,
+							})
 						else
-							table.insert(sections, target, { offset = hole.position + hole.length, length = (sec.length + sec.offset) - (hole.length + hole.position) })
-							table.insert(sections, target, { offset = sec.offset, length = hole.position - sec.offset })
+							table.insert(sections, target, {
+								offset = hole.position + hole.length,
+								length = (sec.length + sec.offset) - (hole.length + hole.position),
+								elevation = sec.elevation,
+								height = sec.height,
+							})
+							table.insert(sections, target, {
+								offset = sec.offset,
+								length = hole.position - sec.offset,
+								elevation = sec.elevation,
+								height = sec.height,
+							})
+						end
+					end
+
+					-- calculate the above and below pieces of wall
+					if hole.elevation ~= nil and hole.height ~= nil then
+						if hole.elevation == sec.elevation then
+							if hole.height == sec.height then
+								-- do nothing
+							else
+								table.insert(sections, target, {
+									offset = hole.position,
+									length = hole.length,
+									elevation = hole.elevation + hole.height,
+									height = sec.height - hole.height,
+								})
+							end
+						else
+							if hole.elevation + hole.height == sec.elevation + sec.height then
+								table.insert(sections, target, {
+									offset = hole.position,
+									length = hole.length,
+									elevation = sec.elevation,
+									height = hole.elevation - sec.elevation,
+								})
+							else
+								table.insert(sections, target, {
+									offset = hole.position,
+									length = hole.length,
+									elevation = sec.elevation,
+									height = hole.elevation - sec.elevation,
+								})
+								table.insert(sections, target, {
+									offset = hole.position,
+									length = hole.length,
+									elevation = hole.elevation + hole.height,
+									height = (sec.height + sec.elevation) - (hole.height + hole.elevation),
+								})
+							end
 						end
 					end
 
@@ -157,8 +220,12 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 			end
 
 			for _, sec in ipairs(sections) do
-				blueprint:add_part('wall', {sec.length * item.length, item.height, item.thickness},
-					{ pstart[1] + pdelta[1] * (sec.offset + sec.length / 2), item.height / 2, pstart[2] + pdelta[2] * (sec.offset + sec.length / 2)},
+				blueprint:add_part('wall', {sec.length * item.length, item.height * sec.height, item.thickness},
+					{
+						pstart[1] + pdelta[1] * (sec.offset + sec.length / 2),
+						item.height * (sec.elevation + sec.height / 2),
+						pstart[2] + pdelta[2] * (sec.offset + sec.length / 2)
+					},
 					{0, item.angle, 0},
 					{
 						surface = Enum.SurfaceType.SmoothNoOutlines,
