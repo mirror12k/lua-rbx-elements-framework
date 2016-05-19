@@ -113,6 +113,8 @@ local function are_segments_inline (s1, s2)
 end
 
 local function find_line_collision (l1, l2)
+	-- i don't like the slope-based solution for this, but it's simple enough, so i'll leave it for now
+	-- will have to reimplement it with a trig-based solution later
 	local local_l2 = to_object_space_all(l1[1], l1[2], l2)
 	local m = slope_of_points(unpack(local_l2))
 	local p = local_l2[1]
@@ -123,6 +125,23 @@ local function find_line_collision (l1, l2)
 	-- print(m, unpack(E))
 
 	return to_global_space(l1[1], l1[2], E)
+end
+
+local function find_segment_collision (s1, s2)
+	local line_collision = find_line_collision(s1, s2)
+	if line_collision == nil then
+		return nil
+	end
+
+	local d1 = distance_of_points(unpack(s1))
+	local d2 = distance_of_points(unpack(s2))
+	if distance_of_points(s1[1], line_collision) > d1 or distance_of_points(s1[2], line_collision) > d1 then
+		return nil
+	elseif distance_of_points(s2[1], line_collision) > d2 or distance_of_points(s2[2], line_collision) > d2 then
+		return nil
+	else
+		return line_collision
+	end
 end
 
 
@@ -143,6 +162,7 @@ return export {
 			are_points_inline = are_points_inline,
 			are_segments_inline = are_segments_inline,
 			find_line_collision = find_line_collision,
+			find_segment_collision = find_segment_collision,
 		},
 	}
 }

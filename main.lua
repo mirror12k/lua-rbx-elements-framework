@@ -139,3 +139,7 @@ print_table(geometry.d2.find_line_collision({{0, 0}, {10, 0}}, {{10, 20}, {20, 4
 print_table(geometry.d2.find_line_collision({{0, 0}, {10, 0}}, {{10, 20}, {20, 10}}))
 print_table(geometry.d2.find_line_collision({{0, 0}, {10, 0}}, {{10, 20}, {20, 10}}))
 print_table(geometry.d2.find_line_collision({{0, 0}, {10, 0}}, {{10, 0}, {10, 10}}))
+
+
+print_table(geometry.d2.find_segment_collision({{-20, 0}, {20, 0}}, {{10, 5}, {10, 10}}))
+print_table(geometry.d2.find_segment_collision({{-20, 20}, {20, -20}}, {{-10, -10}, {10, 10}}))
