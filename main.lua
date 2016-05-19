@@ -110,8 +110,13 @@ print(geometry.d2.angle_of_point({10, -10}))
 print(geometry.d2.angle_of_points({0, 10}, {10, 10}))
 print(geometry.d2.angle_of_points({10, 0}, {10, 10}))
 
-print(unpack(geometry.d2.to_object_space({0, 0}, {20, 10}, {30, 30})))
+print(unpack(geometry.d2.to_object_space({0, 0}, {20, 20}, {30, 30})))
 print_table(geometry.d2.to_object_space_all({0, 0}, {20, 20}, { {30, 30}, {40, 0} }))
+
+
+print(unpack(geometry.d2.to_global_space({10, 15}, {20, 20}, geometry.d2.to_object_space({10, 15}, {20, 20}, {30, 30}))))
+print(unpack(geometry.d2.to_global_space({10, 15}, {-20, 18}, geometry.d2.to_object_space({10, 15}, {-20, 18}, {30, 30}))))
+print_table(geometry.d2.to_global_space_all({-15, -24}, {-40, -15}, geometry.d2.to_object_space_all({-15, -24}, {-40, -15}, { {30, 30}, {40, 0} })))
 
 
 print(geometry.d2.are_points_inline({0, 10}, {0, 20}, {0, 40}))

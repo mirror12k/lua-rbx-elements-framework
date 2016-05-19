@@ -30,37 +30,50 @@ local function angle_of_point (p1)
 end
 
 local function to_object_space (global_point, angle_point, target)
-	angle_point = { angle_point[1] - global_point[1], angle_point[2] - global_point[2] }
-	local global_angle = angle_of_point(angle_point)
-	print("angle: ", global_angle)
-
+	local global_angle = angle_of_point({ angle_point[1] - global_point[1], angle_point[2] - global_point[2] })
 	local result = { target[1] - global_point[1], target[2] - global_point[2] }
-	local result_angle = angle_of_point(result)
-	result_angle = result_angle - global_angle
 
+	local result_angle = angle_of_point(result) - global_angle
 	local dist = math.sqrt(result[1]^2 + result[2]^2)
 
-	local x = dist * math.cos(math.rad(result_angle))
-	local y = dist * math.sin(math.rad(result_angle))
-
-	return {x, y}
+	return {dist * math.cos(math.rad(result_angle)), dist * math.sin(math.rad(result_angle))}
 end
 
 local function to_object_space_all (global_point, angle_point, targets)
-	local results = {}
-	for i = 1, #targets do
-		results[i] = { targets[i][1] - global_point[1], targets[i][2] - global_point[2] }
-	end
-
 	angle_point = { angle_point[1] - global_point[1], angle_point[2] - global_point[2] }
 	local global_angle = angle_of_point(angle_point)
 
+	local results = {}
 	for i = 1, #targets do
+		results[i] = { targets[i][1] - global_point[1], targets[i][2] - global_point[2] }
 		local angle = angle_of_point(results[i]) - global_angle
 		local dist = math.sqrt(results[i][1]^2 + results[i][2]^2)
 
-		results[i][1] = dist * math.cos(math.rad(angle))
-		results[i][2] = dist * math.sin(math.rad(angle))
+		results[i] = { dist * math.cos(math.rad(angle)), dist * math.sin(math.rad(angle)) }
+	end
+
+	return results
+end
+
+local function to_global_space (global_point, angle_point, target)
+	local global_angle = angle_of_point({ angle_point[1] - global_point[1], angle_point[2] - global_point[2] })
+
+	local result_angle = angle_of_point(target) + global_angle
+	local dist = math.sqrt(target[1]^2 + target[2]^2)
+
+	return {dist * math.cos(math.rad(result_angle)) + global_point[1], dist * math.sin(math.rad(result_angle)) + global_point[2]}
+end
+
+local function to_global_space_all (global_point, angle_point, targets)
+	angle_point = { angle_point[1] - global_point[1], angle_point[2] - global_point[2] }
+	local global_angle = angle_of_point(angle_point)
+
+	local results = {}
+	for i = 1, #targets do
+		local angle = angle_of_point(targets[i]) + global_angle
+		local dist = math.sqrt(targets[i][1]^2 + targets[i][2]^2)
+
+		results[i] = { dist * math.cos(math.rad(angle)) + global_point[1], dist * math.sin(math.rad(angle)) + global_point[2] }
 	end
 
 	return results
@@ -99,6 +112,8 @@ return export {
 			angle_of_point = angle_of_point,
 			to_object_space = to_object_space,
 			to_object_space_all = to_object_space_all,
+			to_global_space = to_global_space,
+			to_global_space_all = to_global_space_all,
 			are_points_inline = are_points_inline,
 			are_segments_inline = are_segments_inline,
 		},
