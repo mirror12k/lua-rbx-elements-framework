@@ -79,7 +79,7 @@ import 'aeros/aeros'
 -- bp:build({ cframe = CFrame.new(0, 1, 0) }).Parent = workspace
 
 
-local bp = new 'aeros.RoomBlueprint' ()
+-- local bp = new 'aeros.RoomBlueprint' ()
 -- bp:add_wall({9, 10}, {9, -10})
 -- bp:add_wall({-9, 10}, {-9, -10})
 -- bp:add_wall({10, 9}, {-10, 9})
@@ -94,9 +94,21 @@ local bp = new 'aeros.RoomBlueprint' ()
 -- 	{ position = 0.2, length = 0.2, height = 0.5, elevation = 0.25 },
 -- 	{ position = 0.6, length = 0.2, height = 0.6, elevation = 0.2 },
 -- }})
-bp:add_wall({0, 0}, {50, 50}, { holes = {
-	{ position = 0.2, length = 0.2, height = 0.2, elevation = 0.2 },
-	{ position = 0.2, length = 0.2, height = 0.2, elevation = 0.6 },
-}})
+-- bp:add_wall({0, 0}, {50, 50}, { holes = {
+-- 	{ position = 0.2, length = 0.2, height = 0.2, elevation = 0.2 },
+-- 	{ position = 0.2, length = 0.2, height = 0.2, elevation = 0.6 },
+-- }})
 
-bp:build().Parent = workspace
+-- bp:build().Parent = workspace
+
+
+print(geometry.d2.angle_of_point({10, 10}))
+print(geometry.d2.angle_of_point({-10, 10}))
+print(geometry.d2.angle_of_point({-10, -10}))
+print(geometry.d2.angle_of_point({10, -10}))
+
+print(geometry.d2.angle_of_points({0, 10}, {10, 10}))
+print(geometry.d2.angle_of_points({10, 0}, {10, 10}))
+
+print(unpack(geometry.d2.to_object_space({0, 0}, {20, 10}, {30, 30})))
+print_table(geometry.d2.to_object_space_all({0, 0}, {20, 20}, { {30, 30}, {40, 0} }))

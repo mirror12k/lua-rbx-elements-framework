@@ -20,6 +20,7 @@ import '../lithos/lithos'
 
 local exports = {}
 table_append(exports, import('city', 'import_list'))
+table_append(exports, import('geometry', 'import_list'))
 
 
 
