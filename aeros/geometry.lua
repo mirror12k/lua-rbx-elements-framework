@@ -20,6 +20,21 @@ import '../lithos/lithos'
 import '../hydros/hydros'
 
 
+local function distance_of_points (p1, p2)
+	return math.sqrt((p2[1] - p1[1])^2 + (p2[2] - p1[2])^2)
+end
+
+local function distance_of_point (p1)
+	return math.sqrt(p1[1]^2 + p1[2]^2)
+end
+
+local function slope_of_points (p1, p2)
+	return (p2[2] - p1[2]) / (p2[1] - p1[1])
+end
+
+local function slope_of_point (p1)
+	return p1[2] / p1[1]
+end
 
 local function angle_of_points (p1, p2)
 	return math.deg(math.atan2(p2[2] - p1[2], p2[1] - p1[1]))
@@ -34,7 +49,7 @@ local function to_object_space (global_point, angle_point, target)
 	local result = { target[1] - global_point[1], target[2] - global_point[2] }
 
 	local result_angle = angle_of_point(result) - global_angle
-	local dist = math.sqrt(result[1]^2 + result[2]^2)
+	local dist = distance_of_point(result)
 
 	return {dist * math.cos(math.rad(result_angle)), dist * math.sin(math.rad(result_angle))}
 end
@@ -47,7 +62,7 @@ local function to_object_space_all (global_point, angle_point, targets)
 	for i = 1, #targets do
 		results[i] = { targets[i][1] - global_point[1], targets[i][2] - global_point[2] }
 		local angle = angle_of_point(results[i]) - global_angle
-		local dist = math.sqrt(results[i][1]^2 + results[i][2]^2)
+		local dist = distance_of_point(results[i])
 
 		results[i] = { dist * math.cos(math.rad(angle)), dist * math.sin(math.rad(angle)) }
 	end
@@ -59,7 +74,7 @@ local function to_global_space (global_point, angle_point, target)
 	local global_angle = angle_of_point({ angle_point[1] - global_point[1], angle_point[2] - global_point[2] })
 
 	local result_angle = angle_of_point(target) + global_angle
-	local dist = math.sqrt(target[1]^2 + target[2]^2)
+	local dist = distance_of_point(target)
 
 	return {dist * math.cos(math.rad(result_angle)) + global_point[1], dist * math.sin(math.rad(result_angle)) + global_point[2]}
 end
@@ -71,7 +86,7 @@ local function to_global_space_all (global_point, angle_point, targets)
 	local results = {}
 	for i = 1, #targets do
 		local angle = angle_of_point(targets[i]) + global_angle
-		local dist = math.sqrt(targets[i][1]^2 + targets[i][2]^2)
+		local dist = distance_of_point(targets[i])
 
 		results[i] = { dist * math.cos(math.rad(angle)) + global_point[1], dist * math.sin(math.rad(angle)) + global_point[2] }
 	end
@@ -97,12 +112,28 @@ local function are_segments_inline (s1, s2)
 	return are_points_inline({0, 0}, unpack(local_s2))
 end
 
+local function find_line_collision (l1, l2)
+	local local_l2 = to_object_space_all(l1[1], l1[2], l2)
+	local m = slope_of_points(unpack(local_l2))
+	local p = local_l2[1]
+
+	dx = p[2] / m
+	local E = {p[1] - dx, 0}
+
+	-- print(m, unpack(E))
+
+	return to_global_space(l1[1], l1[2], E)
+end
 
 
 
 return export {
 	geometry = {
 		d2 = {
+			distance_of_points = distance_of_points,
+			distance_of_point = distance_of_point,
+			slope_of_points = slope_of_points,
+			slope_of_point = slope_of_point,
 			angle_of_points = angle_of_points,
 			angle_of_point = angle_of_point,
 			to_object_space = to_object_space,
@@ -111,6 +142,7 @@ return export {
 			to_global_space_all = to_global_space_all,
 			are_points_inline = are_points_inline,
 			are_segments_inline = are_segments_inline,
+			find_line_collision = find_line_collision,
 		},
 	}
 }

@@ -102,31 +102,40 @@ import 'aeros/aeros'
 -- bp:build().Parent = workspace
 
 
-print(geometry.d2.angle_of_point({10, 10}))
-print(geometry.d2.angle_of_point({-10, 10}))
-print(geometry.d2.angle_of_point({-10, -10}))
-print(geometry.d2.angle_of_point({10, -10}))
+-- print(geometry.d2.angle_of_point({10, 10}))
+-- print(geometry.d2.angle_of_point({-10, 10}))
+-- print(geometry.d2.angle_of_point({-10, -10}))
+-- print(geometry.d2.angle_of_point({10, -10}))
 
-print(geometry.d2.angle_of_points({0, 10}, {10, 10}))
-print(geometry.d2.angle_of_points({10, 0}, {10, 10}))
+-- print(geometry.d2.angle_of_points({0, 10}, {10, 10}))
+-- print(geometry.d2.angle_of_points({10, 0}, {10, 10}))
 
-print(unpack(geometry.d2.to_object_space({0, 0}, {20, 20}, {30, 30})))
-print_table(geometry.d2.to_object_space_all({0, 0}, {20, 20}, { {30, 30}, {40, 0} }))
-
-
-print(unpack(geometry.d2.to_global_space({10, 15}, {20, 20}, geometry.d2.to_object_space({10, 15}, {20, 20}, {30, 30}))))
-print(unpack(geometry.d2.to_global_space({10, 15}, {-20, 18}, geometry.d2.to_object_space({10, 15}, {-20, 18}, {30, 30}))))
-print_table(geometry.d2.to_global_space_all({-15, -24}, {-40, -15}, geometry.d2.to_object_space_all({-15, -24}, {-40, -15}, { {30, 30}, {40, 0} })))
+-- print(unpack(geometry.d2.to_object_space({0, 0}, {20, 20}, {30, 30})))
+-- print_table(geometry.d2.to_object_space_all({0, 0}, {20, 20}, { {30, 30}, {40, 0} }))
 
 
-print(geometry.d2.are_points_inline({0, 10}, {0, 20}, {0, 40}))
-print(geometry.d2.are_points_inline({0, 10}, {0, 20}, {0, 0}))
-print(geometry.d2.are_points_inline({0, 10}, {0, 20}, {2, 40}))
-print(geometry.d2.are_points_inline({0, 10}, {1, 20}, {0, 40}))
-print(geometry.d2.are_points_inline({-10, 10}, {-20, 20}, {-40, 40}))
-print(geometry.d2.are_points_inline({-10, 10}, {-20, 20}, {40, -40}))
-print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{40, 40}, {50, 50}}))
-print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{-40, -40}, {-50, -50}}))
-print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{40, 40}, {-50, 50}}))
-print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{40, -40}, {-50, -50}}))
-print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{20, 10}, {30, 20}}))
+-- print(unpack(geometry.d2.to_global_space({10, 15}, {20, 20}, geometry.d2.to_object_space({10, 15}, {20, 20}, {30, 30}))))
+-- print(unpack(geometry.d2.to_global_space({10, 15}, {-20, 18}, geometry.d2.to_object_space({10, 15}, {-20, 18}, {30, 30}))))
+-- print_table(geometry.d2.to_global_space_all({-15, -24}, {-40, -15}, geometry.d2.to_object_space_all({-15, -24}, {-40, -15}, { {30, 30}, {40, 0} })))
+
+
+-- print(geometry.d2.are_points_inline({0, 10}, {0, 20}, {0, 40}))
+-- print(geometry.d2.are_points_inline({0, 10}, {0, 20}, {0, 0}))
+-- print(geometry.d2.are_points_inline({0, 10}, {0, 20}, {2, 40}))
+-- print(geometry.d2.are_points_inline({0, 10}, {1, 20}, {0, 40}))
+-- print(geometry.d2.are_points_inline({-10, 10}, {-20, 20}, {-40, 40}))
+-- print(geometry.d2.are_points_inline({-10, 10}, {-20, 20}, {40, -40}))
+-- print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{40, 40}, {50, 50}}))
+-- print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{-40, -40}, {-50, -50}}))
+-- print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{40, 40}, {-50, 50}}))
+-- print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{40, -40}, {-50, -50}}))
+-- print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{20, 10}, {30, 20}}))
+
+
+print_table(geometry.d2.find_line_collision({{0, 0}, {10, 0}}, {{20, 10}, {30, 20}}))
+print_table(geometry.d2.find_line_collision({{0, 0}, {10, 0}}, {{10, 10}, {20, 20}}))
+print_table(geometry.d2.find_line_collision({{0, 0}, {10, 0}}, {{10, 5}, {20, 10}}))
+print_table(geometry.d2.find_line_collision({{0, 0}, {10, 0}}, {{10, 20}, {20, 40}}))
+print_table(geometry.d2.find_line_collision({{0, 0}, {10, 0}}, {{10, 20}, {20, 10}}))
+print_table(geometry.d2.find_line_collision({{0, 0}, {10, 0}}, {{10, 20}, {20, 10}}))
+print_table(geometry.d2.find_line_collision({{0, 0}, {10, 0}}, {{10, 0}, {10, 10}}))
