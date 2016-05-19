@@ -41,7 +41,7 @@ function draw.cframe(cframe, name, parent)
 end
 
 
-function draw.line(vec1, vec2, parent, color)
+function draw.line(vec1, vec2, color, parent)
 	local distance = (vec1 - vec2).magnitude
 	local p = block.block_from_cframe('line', {distance, 0.2, 0.2}, CFrame.new(vec1) * vector.directional_offset_cframe(vec2 - vec1, distance/2))
 	p.Parent = parent or workspace

@@ -18,6 +18,7 @@ end
 
 import '../lithos/lithos'
 import '../hydros/hydros'
+import 'geometry'
 
 
 local StreetBlueprint
@@ -26,6 +27,17 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 
 	add_street = function (self, pstart, pend, opts)
 		opts = opts or {}
+
+		for _, item in ipairs(self.items) do
+			if item[1] == 'street' then
+				local collision = geometry.d2.find_line_collision({pstart, pend}, {item[2].pstart, item[2].pend})
+				if collision ~= nil then
+					print("collision at ", unpack(collision))
+					draw.cframe(CFrame.new(collision[1], 0, collision[2]))
+				end
+			end
+		end
+
 		self:add('street', {
 			pstart = pstart,
 			pend = pend,
