@@ -68,6 +68,29 @@ end
 
 
 
+local function are_points_inline (p1, p2, p3)
+	local angle = angle_of_points(p1, p2)
+	if angle_of_points(p1, p3) == angle then
+		return true
+	elseif angle_of_points(p3, p1) == angle then
+		return true
+	else
+		return false
+	end
+end
+
+local function are_segments_inline (s1, s2)
+	local angle = angle_of_points(s1[1], s1[2])
+	if angle_of_points(s2[1], s2[2]) == angle then
+		return true
+	elseif angle_of_points(s2[2], s2[1]) == angle then
+		return true
+	else
+		return false
+	end
+end
+
+
 
 return export {
 	geometry = {
@@ -76,6 +99,8 @@ return export {
 			angle_of_point = angle_of_point,
 			to_object_space = to_object_space,
 			to_object_space_all = to_object_space_all,
+			are_points_inline = are_points_inline,
+			are_segments_inline = are_segments_inline,
 		},
 	}
 }
