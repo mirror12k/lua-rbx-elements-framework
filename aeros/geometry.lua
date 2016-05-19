@@ -93,15 +93,10 @@ local function are_points_inline (p1, p2, p3)
 end
 
 local function are_segments_inline (s1, s2)
-	local angle = angle_of_points(s1[1], s1[2])
-	if angle_of_points(s2[1], s2[2]) == angle then
-		return true
-	elseif angle_of_points(s2[2], s2[1]) == angle then
-		return true
-	else
-		return false
-	end
+	local local_s2 = to_object_space_all(s1[1], s1[2], s2)
+	return are_points_inline({0, 0}, unpack(local_s2))
 end
+
 
 
 

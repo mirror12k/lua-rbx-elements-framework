@@ -129,3 +129,4 @@ print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{40, 40}, {50, 50}}
 print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{-40, -40}, {-50, -50}}))
 print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{40, 40}, {-50, 50}}))
 print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{40, -40}, {-50, -50}}))
+print(geometry.d2.are_segments_inline({{10, 10}, {20, 20}}, {{20, 10}, {30, 20}}))
