@@ -163,6 +163,19 @@ end
 
 
 
+local function offset_point(p, angle, dist)
+	return {p[1] + dist * math.cos(math.rad(angle)), p[2] + dist * math.sin(math.rad(angle))}
+end
+
+local function offset_segment(s1, angle, dist)
+	local segment_angle = angle_of_points(unpack(s1))
+	angle = angle + segment_angle
+	local x = dist * math.cos(math.rad(angle))
+	local y = dist * math.sin(math.rad(angle))
+	return {{s1[1][1] + x, s1[1][2] + y}, {s1[2][1] + x, s1[2][2] + y}}
+end
+
+
 return export {
 	geometry = {
 		d2 = {
@@ -180,6 +193,8 @@ return export {
 			are_segments_inline = are_segments_inline,
 			find_line_collision = find_line_collision,
 			find_segment_collision = find_segment_collision,
+			offset_point = offset_point,
+			offset_segment = offset_segment,
 		},
 	}
 }

@@ -144,19 +144,33 @@ import 'aeros/aeros'
 -- print_table(geometry.d2.find_segment_collision({{-20, 0}, {20, 0}}, {{10, 5}, {10, 10}}))
 -- print_table(geometry.d2.find_segment_collision({{-20, 20}, {20, -20}}, {{-10, -10}, {10, 10}}))
 
-math.randomseed(tick())
+-- math.randomseed(tick())
 
-local bp = new 'aeros.StreetBlueprint' ()
--- bp:add_street({10, 10}, {-10, -10})
--- bp:add_street({-10, 10}, {10, -10})
+-- local bp = new 'aeros.StreetBlueprint' ()
+-- -- bp:add_street({10, 10}, {-10, -10})
+-- -- bp:add_street({-10, 10}, {10, -10})
 
--- bp:add_street({200, 200}, {-100, -200})
--- bp:add_street({200, -80}, {-200, -20})
+-- -- bp:add_street({200, 200}, {-100, -200})
+-- -- bp:add_street({200, -80}, {-200, -20})
 
-for _ = 1, 4 do
-	bp:add_street({math.random(0, 400), math.random(-400, 400)}, {math.random(-400, 0), math.random(-400, 400)})
+-- for _ = 1, 4 do
+-- 	bp:add_street({math.random(0, 400), math.random(-400, 400)}, {math.random(-400, 0), math.random(-400, 400)})
+-- end
+
+-- bp:build({ cframe = CFrame.new(0, 1, 0) }).Parent = workspace
+
+
+-- print_table(geometry.d2.offset_segment({{0, 0}, {10, 10}}, -90, 10))
+
+
+local p = block.block('planet', {10, 10, 10})
+p.Parent = workspace
+
+local angle = 0
+while true do
+	angle = angle + 1
+	local pos = geometry.d2.offset_point({0, 0}, angle, 10)
+	p.Position = Vector3.new(pos[1], 10, pos[2])
+	wait()
 end
-
-bp:build({ cframe = CFrame.new(0, 1, 0) }).Parent = workspace
-
 

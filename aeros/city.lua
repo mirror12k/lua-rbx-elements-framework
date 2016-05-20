@@ -28,6 +28,18 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 	add_street = function (self, pstart, pend, opts)
 		opts = opts or {}
 
+		local data = {
+			pstart = pstart,
+			pend = pend,
+			length = geometry.d2.distance_of_points(pstart, pend),
+			angle = 180 - geometry.d2.angle_of_points(pstart, pend),
+			width = opts.width or 50,
+			thickness = opts.thickness or 2,
+			sidewalk_width = opts.sidewalk_width or 8,
+			sidewalk_elevation = opts.sidewalk_elevation or 1,
+			name = opts.name,
+		}
+
 		for _, item in ipairs(self.items) do
 			if item[1] == 'street' then
 				local collision = geometry.d2.find_segment_collision({pstart, pend}, {item[2].pstart, item[2].pend})
@@ -38,17 +50,7 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 			end
 		end
 
-		self:add('street', {
-			pstart = pstart,
-			pend = pend,
-			length = geometry.d2.distance_of_points(pstart, pend),
-			angle = 180 - geometry.d2.angle_of_points(pstart, pend),
-			width = opts.width or 50,
-			thickness = opts.thickness or 2,
-			sidewalk_width = opts.sidewalk_width or 8,
-			sidewalk_elevation = opts.sidewalk_elevation or 1,
-			name = opts.name,
-		})
+		self:add('street', data)
 	end,
 	compile_functions = table_append({
 		street = function (self, blueprint, item, options)
