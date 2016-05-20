@@ -153,39 +153,10 @@ local bp = new 'aeros.StreetBlueprint' ()
 -- bp:add_street({200, 200}, {-100, -200})
 -- bp:add_street({200, -80}, {-200, -20})
 
--- for _ = 1, 4 do
--- 	bp:add_street({math.random(0, 400), math.random(-400, 400)}, {math.random(-400, 0), math.random(-400, 400)})
--- end
-
--- bp:build({ cframe = CFrame.new(0, 1, 0) }).Parent = workspace
-
-
-local space_segment = {{math.random(-100, 100), math.random(-100, 100)}, {math.random(-100, 100), math.random(-100, 100)}}
-
-local points = {}
-for i = 1, 3 do
-	points[i] = {math.random(-100, 100), math.random(-100, 100)}
+for _ = 1, 4 do
+	bp:add_street({math.random(0, 400), math.random(-400, 400)}, {math.random(-400, 0), math.random(-400, 400)})
 end
 
-print_table(points)
+bp:build({ cframe = CFrame.new(0, 1, 0) }).Parent = workspace
 
-for i = 1, #points do
-	draw.cframe(CFrame.new(points[i][1], 0, points[i][2])).Name = i .."pre"
-end
-for i = 1, #points do
-	points[i] = geometry.d2.to_object_space(space_segment[1], space_segment[2], points[i])
-end
-for i = 1, #points do
-	points[i] = geometry.d2.to_global_space(space_segment[1], space_segment[2], points[i])
-end
--- points = geometry.d2.to_object_space_all(space_segment[1], space_segment[2], points)
--- points = geometry.d2.to_global_space_all(space_segment[1], space_segment[2], points)
-for i = 1, #points do
-	draw.cframe(CFrame.new(points[i][1], 0, points[i][2])).Name = i .. "post"
-end
-
-
-draw.line(Vector3.new(space_segment[1][1], 0, space_segment[1][2]), Vector3.new(space_segment[2][1], 0, space_segment[2][2]), {255, 0, 0})
-space_segment = geometry.d2.to_object_space_all(space_segment[1], space_segment[2], space_segment)
-draw.line(Vector3.new(space_segment[1][1], 0, space_segment[1][2]), Vector3.new(space_segment[2][1], 0, space_segment[2][2]), {0, 0, 255})
 

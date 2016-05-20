@@ -113,16 +113,33 @@ local function are_segments_inline (s1, s2)
 end
 
 local function find_line_collision (l1, l2)
+
 	-- i don't like the slope-based solution for this, but it's simple enough, so i'll leave it for now
 	-- will have to reimplement it with a trig-based solution later
+	local local_l1 = to_object_space_all(l1[1], l1[2], l1)
 	local local_l2 = to_object_space_all(l1[1], l1[2], l2)
 	local m = slope_of_points(unpack(local_l2))
 	local p = local_l2[1]
 
+	-- draw.line(Vector3.new(local_l2[1][1], 5, local_l2[1][2]), Vector3.new(local_l2[2][1], 5, local_l2[2][2]), {0, 255, 0})
+	-- draw.line(Vector3.new(local_l1[1][1], 5, local_l1[1][2]), Vector3.new(local_l1[2][1], 5, local_l1[2][2]), {0, 0, 255})
+
 	dx = p[2] / m
 	local E = {p[1] - dx, 0}
+	-- draw.point2d(E, 5, 'coll')
+
 
 	-- print(m, unpack(E))
+
+	-- local_l1 = to_global_space_all(l1[1], l1[2], local_l1)
+	-- local_l2 = to_global_space_all(l1[1], l1[2], local_l2)
+	-- local global_E = to_global_space(l1[1], l1[2], E)
+
+	-- draw.line(Vector3.new(local_l2[1][1], 5, local_l2[1][2]), Vector3.new(local_l2[2][1], 5, local_l2[2][2]), {255, 255, 0})
+	-- draw.line(Vector3.new(local_l1[1][1], 5, local_l1[1][2]), Vector3.new(local_l1[2][1], 5, local_l1[2][2]), {255, 0, 255})
+
+	-- draw.point2d(global_E, 5, 'coll')
+
 
 	return to_global_space(l1[1], l1[2], E)
 end

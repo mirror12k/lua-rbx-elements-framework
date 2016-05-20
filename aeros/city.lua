@@ -30,10 +30,10 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 
 		for _, item in ipairs(self.items) do
 			if item[1] == 'street' then
-				local collision = geometry.d2.find_line_collision({pstart, pend}, {item[2].pstart, item[2].pend})
+				local collision = geometry.d2.find_segment_collision({pstart, pend}, {item[2].pstart, item[2].pend})
 				if collision ~= nil then
 					print("collision at ", unpack(collision))
-					draw.cframe(CFrame.new(collision[1], 0, collision[2]))
+					draw.point2d(collision)
 				end
 			end
 		end
@@ -41,8 +41,8 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 		self:add('street', {
 			pstart = pstart,
 			pend = pend,
-			length = math.sqrt(math.abs(pstart[1] - pend[1])^2 + math.abs(pstart[2] - pend[2])^2),
-			angle = math.deg(math.atan2(pend[2] - pstart[2], pend[1] - pstart[1])),
+			length = geometry.d2.distance_of_points(pstart, pend),
+			angle = 180 - geometry.d2.angle_of_points(pstart, pend),
 			width = opts.width or 50,
 			thickness = opts.thickness or 2,
 			sidewalk_width = opts.sidewalk_width or 8,
@@ -108,12 +108,14 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 		self:add('wall', {
 			pstart = pstart,
 			pend = pend,
-			length = math.sqrt(math.abs(pstart[1] - pend[1])^2 + math.abs(pstart[2] - pend[2])^2),
+			length = geometry.d2.distance_of_points(pstart, pend),
 			-- i honestly have no clue what the 180 - ... is for
 			-- it just worked properly for a while, and then started mirroring since the new sectioned wall creation
 			-- and this mirroring reverses the new mirroring.
 			-- though i'd still love to know why the mirroring is happening in the first place, cause i don't remember changing anything about the angling code
-			angle = 180 - math.deg(math.atan2(pend[2] - pstart[2], pend[1] - pstart[1])),
+
+			-- ok, a little more research shows that because roblox has it's z axis reversed backwards, the forth quadrant is where the first should be, etc
+			angle = 180 - geometry.d2.angle_of_points(pstart, pend),
 			height = options.height or self.height or 12,
 			thickness = options.thickness or self.thickness or 2,
 			holes = options.holes,

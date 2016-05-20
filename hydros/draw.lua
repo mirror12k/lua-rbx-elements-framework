@@ -40,6 +40,14 @@ function draw.cframe(cframe, name, parent)
 	return m
 end
 
+function draw.point2d(p, y, name, parent)
+	return draw.cframe(CFrame.new(p[1], y or 0, p[2]), name, parent)
+end
+
+function draw.vertical_line(p, color, parent)
+	return draw.line(Vector3.new(p[1], -1000, p[2]), Vector3.new(p[1], 1000, p[2]), color, parent)
+end
+
 
 function draw.line(vec1, vec2, color, parent)
 	local distance = (vec1 - vec2).magnitude
