@@ -17,7 +17,6 @@ else
 end
 
 import '../lithos/lithos'
-import '../hydros/hydros'
 
 
 local function distance_of_points (p1, p2)

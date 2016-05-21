@@ -18,7 +18,6 @@ end
 
 import '../lithos/lithos'
 import '../hydros/hydros'
-import 'geometry'
 
 
 local StreetBlueprint
@@ -103,23 +102,6 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 
 		self:add('street', data)
 	end,
-	merge_holes = function (self, holes)
-		local new_holes = {}
-		while #holes > 0 do
-			local hole = table.remove(holes, #holes)
-			for i = #holes, 1, -1 do
-				if hole.position >= holes[i].position and hole.position < holes[i].position + holes[i].length or
-						holes[i].position >= hole.position and holes[i].position < hole.position + hole.length then
-					local other = table.remove(holes, i)
-					hole.length = math.max(hole.position + hole.length, other.position + other.length)
-					hole.position = math.min(hole.position, other.position)
-					hole.length = hole.length - hole.position
-				end
-			end
-			new_holes[#new_holes + 1] = hole
-		end
-		return new_holes
-	end,
 	compile_functions = table_append({
 		street = function (self, blueprint, item, options)
 			blueprint:add_part('pavement', {item.length, item.thickness, item.width},
@@ -135,49 +117,7 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 					(item.pstart[2] + item.pend[2]) / 2
 				) * vector.angled_cframe({0, item.angle, 0})
 
-			item.right_sidewalk_holes = self:merge_holes(item.right_sidewalk_holes)
-			local sections = {{ position = 0, length = 1 }}
-			for _, hole in ipairs(item.right_sidewalk_holes) do
-				-- draw.cframe(CFrame.new(item.pstart[1], item.sidewalk_elevation, item.pstart[2])
-				-- 	* vector.angled_cframe({0, item.angle, 0})
-				-- 	* CFrame.new(0, 0, item.width / 2 + item.sidewalk_width / 2)
-				-- 	* CFrame.new(-hole.position * item.length, 0, 0)
-				-- )
-				-- draw.cframe(CFrame.new(item.pstart[1], item.sidewalk_elevation, item.pstart[2])
-				-- 	* vector.angled_cframe({0, item.angle, 0})
-				-- 	* CFrame.new(0, 0, item.width / 2 + item.sidewalk_width / 2)
-				-- 	* CFrame.new(-(hole.position + hole.length) * item.length, 0, 0)
-				-- )
-				local target = -1
-				for i, v in ipairs(sections) do
-					if v.position <= hole.position and v.position + v.length > hole.position then
-						if hole.length + hole.position > v.position + v.length then
-							error('invalid hole: ' .. tostring(hole.position) .. ' - ' .. tostring(hole.length))
-						end
-						target = i
-						break
-					end
-				end
-
-				if target == -1 then
-					error('no matching section found: ' .. hole.length .. ", " .. hole.position)
-				end
-
-				local sec = table.remove(sections, target)
-				if sec.position < hole.position then
-					table.insert(sections, target, {
-						position = sec.position,
-						length = hole.position - sec.position,
-					})
-				end
-				if sec.position + sec.length > hole.position + hole.length then
-					table.insert(sections, target, {
-						position = hole.position + hole.length,
-						length = sec.position + sec.length - (hole.position + hole.length),
-					})
-				end
-			end
-
+			local sections = spaceful.holes_to_sections(spaceful.merge_holes(item.right_sidewalk_holes))
 			for _, sec in ipairs(sections) do
 				blueprint:add_part('sidewalk', {item.length * sec.length, item.thickness, item.sidewalk_width},
 					vector.vector3_to_table((
@@ -190,39 +130,7 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 					})
 			end
 
-			item.left_sidewalk_holes = self:merge_holes(item.left_sidewalk_holes)
-			sections = {{ position = 0, length = 1 }}
-			for _, hole in ipairs(item.left_sidewalk_holes) do
-				local target = -1
-				for i, v in ipairs(sections) do
-					if v.position <= hole.position and v.position + v.length > hole.position then
-						if hole.length + hole.position > v.position + v.length then
-							error('invalid hole: ' .. tostring(hole.position) .. ' - ' .. tostring(hole.length))
-						end
-						target = i
-						break
-					end
-				end
-
-				if target == -1 then
-					error('no matching section found')
-				end
-
-				local sec = table.remove(sections, target)
-				if sec.position < hole.position then
-					table.insert(sections, target, {
-						position = sec.position,
-						length = hole.position - sec.position,
-					})
-				end
-				if sec.position + sec.length > hole.position + hole.length then
-					table.insert(sections, target, {
-						position = hole.position + hole.length,
-						length = sec.position + sec.length - (hole.position + hole.length),
-					})
-				end
-			end
-
+			sections = spaceful.holes_to_sections(spaceful.merge_holes(item.left_sidewalk_holes))
 			for _, sec in ipairs(sections) do
 				blueprint:add_part('sidewalk', {item.length * sec.length, item.thickness, item.sidewalk_width},
 					vector.vector3_to_table((
