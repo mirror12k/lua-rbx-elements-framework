@@ -47,17 +47,39 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 		local collision_right = geometry.d2.find_segment_collision(right_sidewalk, other_left)
 		if collision_left ~= nil and collision_right ~= nil then
 			-- draw.vertical_line(left_start, {255, 0, 0})
-			-- draw.vertical_line(collision_left, {255, 255, 0})
 			-- draw.vertical_line(collision_right, {255, 255, 0})
 			local offset_left = geometry.d2.distance_of_points(left_start, collision_left)
 			local offset_right = geometry.d2.distance_of_points(left_start, collision_right)
 			offset_left = offset_left / other.length
 			offset_right = offset_right / other.length
-			print('segment left: ', offset_right, offset_left)
+			-- print('segment left: ', offset_right, offset_left)
 			if offset_left < offset_right then
 				self:add_sidewalk_hole(other, 'left', offset_left, offset_right)
 			else
 				self:add_sidewalk_hole(other, 'left', offset_right, offset_left)
+			end
+		elseif collision_left ~= nil then
+			-- draw.vertical_line(collision_left, {255, 255, 0})
+			local offset_left = geometry.d2.distance_of_points(left_start, collision_left)
+			offset_left = offset_left / other.length
+			-- local angle_diff = geometry.d2.angle_diff(street.angle, other.angle)
+			-- print(street.angle, other.angle, angle_diff)
+			-- if angle_diff > 90 then
+				self:add_sidewalk_hole(other, 'left', 0, offset_left)
+			-- else
+			-- 	self:add_sidewalk_hole(other, 'left', offset_left, 1)
+			-- end
+
+		elseif collision_right ~= nil then
+			draw.vertical_line(collision_right, {0, 255, 255})
+			local offset_right = geometry.d2.distance_of_points(left_start, collision_right)
+			offset_right = offset_right / other.length
+			local angle_diff = geometry.d2.angle_diff(street.angle, other.angle)
+			-- print(street.angle, other.angle, angle_diff)
+			if angle_diff > 90 then
+				self:add_sidewalk_hole(other, 'left', 0, offset_right)
+			else
+				self:add_sidewalk_hole(other, 'left', offset_right, 1)
 			end
 		end
 
@@ -68,11 +90,25 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 			local offset_right = geometry.d2.distance_of_points(right_start, collision_right)
 			offset_left = offset_left / other.length
 			offset_right = offset_right / other.length
-			print('segment right: ', offset_right, offset_left)
+			-- print('segment right: ', offset_right, offset_left)
 			if offset_left < offset_right then
 				self:add_sidewalk_hole(other, 'right', offset_left, offset_right)
 			else
 				self:add_sidewalk_hole(other, 'right', offset_right, offset_left)
+			end
+		elseif collision_left ~= nil then
+			local offset_right = geometry.d2.distance_of_points(right_start, collision_left)
+			offset_right = offset_right / other.length
+			self:add_sidewalk_hole(other, 'right', 0, offset_right)
+		elseif collision_right ~= nil then
+			local offset_right = geometry.d2.distance_of_points(right_start, collision_right)
+			offset_right = offset_right / other.length
+			local angle_diff = geometry.d2.angle_diff(street.angle, other.angle)
+			-- print(street.angle, other.angle, angle_diff)
+			if angle_diff > 90 then
+				self:add_sidewalk_hole(other, 'right', 0, offset_right)
+			else
+				self:add_sidewalk_hole(other, 'right', offset_right, 1)
 			end
 		end
 	end,
@@ -119,26 +155,26 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 
 			local sections = spaceful.holes_to_sections(spaceful.merge_holes(item.right_sidewalk_holes))
 			for _, sec in ipairs(sections) do
-				blueprint:add_part('sidewalk', {item.length * sec.length, item.thickness, item.sidewalk_width},
+				blueprint:add_part('sidewalk_left', {item.length * sec.length, item.thickness, item.sidewalk_width},
 					vector.vector3_to_table((
 						sidewalk_cframe * CFrame.new(-(sec.position + sec.length / 2 - 0.5) * item.length, 0, item.width / 2 + item.sidewalk_width / 2)
 					).p),
 					{0, item.angle, 0},
 					{
-						color = {0.5, 0.5, 0.5},
+						color = {1, 0.5, 0.5},
 						surface = Enum.SurfaceType.SmoothNoOutlines,
 					})
 			end
 
 			sections = spaceful.holes_to_sections(spaceful.merge_holes(item.left_sidewalk_holes))
 			for _, sec in ipairs(sections) do
-				blueprint:add_part('sidewalk', {item.length * sec.length, item.thickness, item.sidewalk_width},
+				blueprint:add_part('sidewalk_right', {item.length * sec.length, item.thickness, item.sidewalk_width},
 					vector.vector3_to_table((
 						sidewalk_cframe * CFrame.new(-(sec.position + sec.length / 2 - 0.5) * item.length, 0, - (item.width / 2 + item.sidewalk_width / 2))
 					).p),
 					{0, item.angle, 0},
 					{
-						color = {0.5, 0.5, 0.5},
+						color = {0.5, 0.5, 1},
 						surface = Enum.SurfaceType.SmoothNoOutlines,
 					})
 			end

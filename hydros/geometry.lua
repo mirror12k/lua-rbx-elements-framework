@@ -43,6 +43,11 @@ local function angle_of_point (p1)
 	return math.deg(math.atan2(p1[2], p1[1]))
 end
 
+
+local function angle_diff (a1, a2)
+	return math.min(math.abs(a1 - a2), math.abs(a1 - (a2 - 360)))
+end
+
 local function to_object_space (global_point, angle_point, target)
 	local global_angle = angle_of_point({ angle_point[1] - global_point[1], angle_point[2] - global_point[2] })
 	local result = { target[1] - global_point[1], target[2] - global_point[2] }
@@ -184,6 +189,7 @@ return export {
 			slope_of_point = slope_of_point,
 			angle_of_points = angle_of_points,
 			angle_of_point = angle_of_point,
+			angle_diff = angle_diff,
 			to_object_space = to_object_space,
 			to_object_space_all = to_object_space_all,
 			to_global_space = to_global_space,
