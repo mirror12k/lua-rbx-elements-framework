@@ -71,7 +71,7 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 			-- end
 
 		elseif collision_right ~= nil then
-			draw.vertical_line(collision_right, {0, 255, 255})
+			-- draw.vertical_line(collision_right, {0, 255, 255})
 			local offset_right = geometry.d2.distance_of_points(left_start, collision_right)
 			offset_right = offset_right / other.length
 			local angle_diff = geometry.d2.angle_diff(street.angle, other.angle)
@@ -97,10 +97,12 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 				self:add_sidewalk_hole(other, 'right', offset_right, offset_left)
 			end
 		elseif collision_left ~= nil then
+			draw.vertical_line(collision_left, {255, 255, 0})
 			local offset_right = geometry.d2.distance_of_points(right_start, collision_left)
 			offset_right = offset_right / other.length
 			self:add_sidewalk_hole(other, 'right', 0, offset_right)
 		elseif collision_right ~= nil then
+			draw.vertical_line(collision_right, {0, 255, 255})
 			local offset_right = geometry.d2.distance_of_points(right_start, collision_right)
 			offset_right = offset_right / other.length
 			local angle_diff = geometry.d2.angle_diff(street.angle, other.angle)
@@ -235,109 +237,19 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 			local length = item.length
 			local pstart = item.pstart
 			local pdelta = { item.pend[1] - item.pstart[1], item.pend[2] - item.pstart[2] }
-			local sections = {{ positionx = 0, lengthx = 1, elevation = 0, height = 1 }}
+			local sections
 
 			if item.holes ~= nil then
-				for _, hole in ipairs(item.holes) do
-					local target = -1
-					for i, v in ipairs(sections) do
-						if v.positionx <= hole.position and v.positionx + v.lengthx > hole.position and
-								(hole.elevation == nil and hole.height == nil or v.elevation <= hole.elevation and v.elevation + v.height > hole.elevation) then
-							if hole.lengthx + hole.position > v.positionx + v.lengthx then
-								error('invalid hole: ' .. tostring(hole.position) .. ' - ' .. tostring(hole.lengthx))
-							end
-							target = i
-							break
-						end
-					end
-
-					if target == -1 then
-						error('hole out of bounds: ' .. tostring(hole.position) .. ' - ' .. tostring(hole.lengthx))
-					end
-
-					-- calculate the before and after pieces of wall
-					local sec = table.remove(sections, target)
-					if sec.positionx == hole.position then
-						if sec.lengthx == hole.lengthx then
-							-- do nothing to delete the section
-						else
-							table.insert(sections, target, {
-								positionx = sec.positionx + hole.lengthx,
-								lengthx = sec.lengthx - hole.lengthx,
-								elevation = sec.elevation,
-								height = sec.height,
-							})
-						end
-					else
-						if sec.positionx + sec.lengthx == hole.position + hole.lengthx then
-							table.insert(sections, target, {
-								positionx = sec.positionx,
-								lengthx = hole.position - sec.positionx,
-								elevation = sec.elevation,
-								height = sec.height,
-							})
-						else
-							table.insert(sections, target, {
-								positionx = hole.position + hole.lengthx,
-								lengthx = (sec.lengthx + sec.positionx) - (hole.lengthx + hole.position),
-								elevation = sec.elevation,
-								height = sec.height,
-							})
-							table.insert(sections, target, {
-								positionx = sec.positionx,
-								lengthx = hole.position - sec.positionx,
-								elevation = sec.elevation,
-								height = sec.height,
-							})
-						end
-					end
-
-					-- calculate the above and below pieces of wall
-					if hole.elevation ~= nil and hole.height ~= nil then
-						if hole.elevation == sec.elevation then
-							if hole.height == sec.height then
-								-- do nothing
-							else
-								table.insert(sections, target, {
-									positionx = hole.position,
-									lengthx = hole.lengthx,
-									elevation = hole.elevation + hole.height,
-									height = sec.height - hole.height,
-								})
-							end
-						else
-							if hole.elevation + hole.height == sec.elevation + sec.height then
-								table.insert(sections, target, {
-									positionx = hole.position,
-									lengthx = hole.lengthx,
-									elevation = sec.elevation,
-									height = hole.elevation - sec.elevation,
-								})
-							else
-								table.insert(sections, target, {
-									positionx = hole.position,
-									lengthx = hole.lengthx,
-									elevation = sec.elevation,
-									height = hole.elevation - sec.elevation,
-								})
-								table.insert(sections, target, {
-									positionx = hole.position,
-									lengthx = hole.lengthx,
-									elevation = hole.elevation + hole.height,
-									height = (sec.height + sec.elevation) - (hole.height + hole.elevation),
-								})
-							end
-						end
-					end
-
-				end
+				sections = spaceful.holes_to_sections_d2(item.holes)
+			else
+				sections = {{ positionx = 0, lengthx = 1, positiony = 0, lengthy = 1 }}
 			end
 
 			for _, sec in ipairs(sections) do
-				blueprint:add_part('wall', {sec.lengthx * item.lengthx, item.height * sec.height, item.thickness},
+				blueprint:add_part('wall', {item.length * sec.lengthx, item.height * sec.lengthy, item.thickness},
 					{
 						pstart[1] + pdelta[1] * (sec.positionx + sec.lengthx / 2),
-						item.height * (sec.elevation + sec.height / 2),
+						item.height * (sec.positiony + sec.lengthy / 2),
 						pstart[2] + pdelta[2] * (sec.positionx + sec.lengthx / 2)
 					},
 					{0, item.angle, 0},

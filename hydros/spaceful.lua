@@ -73,9 +73,113 @@ local function holes_to_sections(holes)
 	return sections
 end
 
+
+local function holes_to_sections_d2(holes)
+	local sections = {{ positionx = 0, lengthx = 1, positiony = 0, lengthy = 1 }}
+
+	for _, hole in ipairs(holes) do
+		local target = -1
+		for i, v in ipairs(sections) do
+			if v.positionx <= hole.positionx and v.positionx + v.lengthx > hole.positionx and
+					(hole.positiony == nil and hole.lengthy == nil or v.positiony <= hole.positiony and v.positiony + v.lengthy > hole.positiony) then
+				if hole.lengthx + hole.positionx > v.positionx + v.lengthx then
+					error('invalid hole: ' .. tostring(hole.positionx) .. ' - ' .. tostring(hole.lengthx))
+				end
+				target = i
+				break
+			end
+		end
+
+		if target == -1 then
+			error('hole out of bounds: ' .. tostring(hole.positionx) .. ' - ' .. tostring(hole.lengthx))
+		end
+
+		-- calculate the before and after pieces of wall
+		local sec = table.remove(sections, target)
+		if sec.positionx == hole.positionx then
+			if sec.lengthx == hole.lengthx then
+				-- do nothing to delete the section
+			else
+				table.insert(sections, target, {
+					positionx = sec.positionx + hole.lengthx,
+					lengthx = sec.lengthx - hole.lengthx,
+					positiony = sec.positiony,
+					lengthy = sec.lengthy,
+				})
+			end
+		else
+			if sec.positionx + sec.lengthx == hole.positionx + hole.lengthx then
+				table.insert(sections, target, {
+					positionx = sec.positionx,
+					lengthx = hole.positionx - sec.positionx,
+					positiony = sec.positiony,
+					lengthy = sec.lengthy,
+				})
+			else
+				table.insert(sections, target, {
+					positionx = hole.positionx + hole.lengthx,
+					lengthx = (sec.lengthx + sec.positionx) - (hole.lengthx + hole.positionx),
+					positiony = sec.positiony,
+					lengthy = sec.lengthy,
+				})
+				table.insert(sections, target, {
+					positionx = sec.positionx,
+					lengthx = hole.positionx - sec.positionx,
+					positiony = sec.positiony,
+					lengthy = sec.lengthy,
+				})
+			end
+		end
+
+		-- calculate the above and below pieces of wall
+		if hole.positiony ~= nil and hole.lengthy ~= nil then
+			if hole.positiony == sec.positiony then
+				if hole.lengthy == sec.lengthy then
+					-- do nothing
+				else
+					table.insert(sections, target, {
+						positionx = hole.positionx,
+						lengthx = hole.lengthx,
+						positiony = hole.positiony + hole.lengthy,
+						lengthy = sec.lengthy - hole.lengthy,
+					})
+				end
+			else
+				if hole.positiony + hole.lengthy == sec.positiony + sec.lengthy then
+					table.insert(sections, target, {
+						positionx = hole.positionx,
+						lengthx = hole.lengthx,
+						positiony = sec.positiony,
+						lengthy = hole.positiony - sec.positiony,
+					})
+				else
+					table.insert(sections, target, {
+						positionx = hole.positionx,
+						lengthx = hole.lengthx,
+						positiony = sec.positiony,
+						lengthy = hole.positiony - sec.positiony,
+					})
+					table.insert(sections, target, {
+						positionx = hole.positionx,
+						lengthx = hole.lengthx,
+						positiony = hole.positiony + hole.lengthy,
+						lengthy = (sec.lengthy + sec.positiony) - (hole.lengthy + hole.positiony),
+					})
+				end
+			end
+		end
+	end
+
+	return sections
+end
+
+
+
+
 return export {
 	spaceful = {
 		merge_holes = merge_holes,
 		holes_to_sections = holes_to_sections,
+		holes_to_sections_d2 = holes_to_sections_d2,
 	},
 }

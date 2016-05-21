@@ -79,7 +79,7 @@ import 'aeros/aeros'
 -- bp:build({ cframe = CFrame.new(0, 1, 0) }).Parent = workspace
 
 
--- local bp = new 'aeros.RoomBlueprint' ()
+local bp = new 'aeros.RoomBlueprint' ()
 -- bp:add_wall({9, 10}, {9, -10})
 -- bp:add_wall({-9, 10}, {-9, -10})
 -- bp:add_wall({10, 9}, {-10, 9})
@@ -90,16 +90,16 @@ import 'aeros/aeros'
 -- bp:add_room({10, 18}, 40, 20)
 -- bp:add_room({10, 36}, 40, 20)
 
--- bp:add_wall({0, 0}, {50, 50}, { holes = {
--- 	{ position = 0.2, length = 0.2, height = 0.5, elevation = 0.25 },
--- 	{ position = 0.6, length = 0.2, height = 0.6, elevation = 0.2 },
--- }})
--- bp:add_wall({0, 0}, {50, 50}, { holes = {
--- 	{ position = 0.2, length = 0.2, height = 0.2, elevation = 0.2 },
--- 	{ position = 0.2, length = 0.2, height = 0.2, elevation = 0.6 },
--- }})
+bp:add_wall({0, 0}, {-50, 50}, { holes = {
+	{ positionx = 0.2, lengthx = 0.2, positiony = 0.25, lengthy = 0.5 },
+	{ positionx = 0.6, lengthx = 0.2, positiony = 0.2, lengthy = 0.6 },
+}})
+bp:add_wall({0, 0}, {50, 50}, { holes = {
+	{ positionx = 0.2, lengthx = 0.2, positiony = 0.2, lengthy = 0.2 },
+	{ positionx = 0.2, lengthx = 0.2, positiony = 0.6, lengthy = 0.2 },
+}})
 
--- bp:build().Parent = workspace
+bp:build().Parent = workspace
 
 
 -- print(geometry.d2.angle_of_point({10, 10}))
@@ -148,24 +148,24 @@ import 'aeros/aeros'
 
 
 
-math.randomseed(tick())
+-- math.randomseed(tick())
 
-local bp = new 'aeros.StreetBlueprint' ()
--- bp:add_street({10, 10}, {-10, -10})
--- bp:add_street({-10, 10}, {10, -10})
+-- local bp = new 'aeros.StreetBlueprint' ()
+-- -- bp:add_street({10, 10}, {-10, -10})
+-- -- bp:add_street({-10, 10}, {10, -10})
 
--- bp:add_street({200, 200}, {-100, -200})
--- bp:add_street({200, -80}, {-200, -20})
+-- -- bp:add_street({200, 200}, {-100, -200})
+-- -- bp:add_street({200, -80}, {-200, -20})
 
-bp:add_street({200, 200}, {-200, -200})
-bp:add_street({-100, -100}, {-200, -100})
-bp:add_street({100, 100}, {100, 200})
+-- bp:add_street({200, 200}, {-200, -200})
+-- bp:add_street({-100, -100}, {-200, -100})
+-- bp:add_street({100, 100}, {100, 200})
 
--- for _ = 1, 15 do
--- 	bp:add_street({math.random(-1000, 1000), math.random(-1000, 1000)}, {math.random(-1000, 1000), math.random(-1000, 1000)})
--- end
+-- -- for _ = 1, 15 do
+-- -- 	bp:add_street({math.random(-1000, 1000), math.random(-1000, 1000)}, {math.random(-1000, 1000), math.random(-1000, 1000)})
+-- -- end
 
-bp:build({ cframe = CFrame.new(0, 1, 0) }).Parent = workspace
+-- bp:build({ cframe = CFrame.new(0, 1, 0) }).Parent = workspace
 
 
 
