@@ -25,6 +25,53 @@ local StreetBlueprint
 StreetBlueprint = class 'aeros.StreetBlueprint' {
 	_extends = class_by_name 'hydros.CompiledBlueprint',
 
+
+	add_sidewalk_hole = function (self, street, side, hole_start, hole_end)
+		if side == 'left' then
+			street.left_sidewalk_holes[#street.left_sidewalk_holes + 1] = {hole_start, hole_end}
+		else
+			street.right_sidewalk_holes[#street.right_sidewalk_holes + 1] = {hole_start, hole_end}
+		end
+	end,
+	calculate_intersection = function (self, street, other)
+		local left_sidewalk = geometry.d2.offset_segment({street.pstart, street.pend}, 90, other.width / 2)
+		local right_sidewalk = geometry.d2.offset_segment({street.pstart, street.pend}, -90, other.width / 2)
+
+		local left_start = geometry.d2.offset_point(other.pstart, 90, other.width / 2)
+		local right_start = geometry.d2.offset_point(other.pstart, -90, other.width / 2)
+		local other_left = geometry.d2.offset_segment({other.pstart, other.pend}, 90, other.width / 2)
+		local other_right = geometry.d2.offset_segment({other.pstart, other.pend}, -90, other.width / 2)
+
+		local collision_left = geometry.d2.find_segment_collision(left_sidewalk, other_left)
+		local collision_right = geometry.d2.find_segment_collision(right_sidewalk, other_left)
+		if collision_left ~= nil and collision_right ~= nil then
+			local offset_left = geometry.d2.distance_of_points(left_start, collision_left)
+			local offset_right = geometry.d2.distance_of_points(left_start, collision_right)
+			offset_left = offset_left / other.length
+			offset_right = offset_right / other.length
+			print('segment left: ', offset_right, offset_left)
+			if offset_left < offset_right then
+				self:add_sidewalk_hole(other, 'left', offset_left, offset_right)
+			else
+				self:add_sidewalk_hole(other, 'left', offset_right, offset_left)
+			end
+		end
+
+		collision_left = geometry.d2.find_segment_collision(left_sidewalk, other_right)
+		collision_right = geometry.d2.find_segment_collision(right_sidewalk, other_right)
+		if collision_left ~= nil and collision_right ~= nil then
+			local offset_left = geometry.d2.distance_of_points(right_start, collision_left)
+			local offset_right = geometry.d2.distance_of_points(right_start, collision_right)
+			offset_left = offset_left / other.length
+			offset_right = offset_right / other.length
+			print('segment right: ', offset_right, offset_left)
+			if offset_left < offset_right then
+				self:add_sidewalk_hole(other, 'right', offset_left, offset_right)
+			else
+				self:add_sidewalk_hole(other, 'right', offset_right, offset_left)
+			end
+		end
+	end,
 	add_street = function (self, pstart, pend, opts)
 		opts = opts or {}
 
@@ -38,15 +85,14 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 			sidewalk_width = opts.sidewalk_width or 8,
 			sidewalk_elevation = opts.sidewalk_elevation or 1,
 			name = opts.name,
+			left_sidewalk_holes = {},
+			right_sidewalk_holes = {},
 		}
 
 		for _, item in ipairs(self.items) do
 			if item[1] == 'street' then
-				local collision = geometry.d2.find_segment_collision({pstart, pend}, {item[2].pstart, item[2].pend})
-				if collision ~= nil then
-					print("collision at ", unpack(collision))
-					draw.point2d(collision)
-				end
+				self:calculate_intersection(data, item[2])
+				self:calculate_intersection(item[2], data)
 			end
 		end
 
