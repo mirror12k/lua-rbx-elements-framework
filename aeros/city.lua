@@ -28,23 +28,28 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 
 	add_sidewalk_hole = function (self, street, side, hole_start, hole_end)
 		if side == 'left' then
-			street.left_sidewalk_holes[#street.left_sidewalk_holes + 1] = {hole_start, hole_end}
+			street.left_sidewalk_holes[#street.left_sidewalk_holes + 1] = { position = hole_start, length = hole_end - hole_start }
 		else
-			street.right_sidewalk_holes[#street.right_sidewalk_holes + 1] = {hole_start, hole_end}
+			street.right_sidewalk_holes[#street.right_sidewalk_holes + 1] = { position = hole_start, length = hole_end - hole_start }
 		end
 	end,
 	calculate_intersection = function (self, street, other)
 		local left_sidewalk = geometry.d2.offset_segment({street.pstart, street.pend}, 90, other.width / 2)
 		local right_sidewalk = geometry.d2.offset_segment({street.pstart, street.pend}, -90, other.width / 2)
 
-		local left_start = geometry.d2.offset_point(other.pstart, 90, other.width / 2)
-		local right_start = geometry.d2.offset_point(other.pstart, -90, other.width / 2)
+		local left_start = geometry.d2.offset_segment({other.pstart, other.pend}, 90, other.width / 2)
+		left_start = left_start[1]
+		local right_start = geometry.d2.offset_segment({other.pstart, other.pend}, -90, other.width / 2)
+		right_start = right_start[1]
 		local other_left = geometry.d2.offset_segment({other.pstart, other.pend}, 90, other.width / 2)
 		local other_right = geometry.d2.offset_segment({other.pstart, other.pend}, -90, other.width / 2)
 
 		local collision_left = geometry.d2.find_segment_collision(left_sidewalk, other_left)
 		local collision_right = geometry.d2.find_segment_collision(right_sidewalk, other_left)
 		if collision_left ~= nil and collision_right ~= nil then
+			-- draw.vertical_line(left_start, {255, 0, 0})
+			-- draw.vertical_line(collision_left, {255, 255, 0})
+			-- draw.vertical_line(collision_right, {255, 255, 0})
 			local offset_left = geometry.d2.distance_of_points(left_start, collision_left)
 			local offset_right = geometry.d2.distance_of_points(left_start, collision_right)
 			offset_left = offset_left / other.length
@@ -112,20 +117,104 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 					item.sidewalk_elevation - item.thickness / 2,
 					(item.pstart[2] + item.pend[2]) / 2
 				) * vector.angled_cframe({0, item.angle, 0})
-			blueprint:add_part('sidewalk', {item.length, item.thickness, item.sidewalk_width},
-				vector.vector3_to_table((sidewalk_cframe * CFrame.new(0, 0, item.width / 2 + item.sidewalk_width / 2)).p),
-				{0, item.angle, 0},
-				{
-					color = {0.5, 0.5, 0.5},
-					surface = Enum.SurfaceType.SmoothNoOutlines,
-				})
-			blueprint:add_part('sidewalk', {item.length, item.thickness, item.sidewalk_width},
-				vector.vector3_to_table((sidewalk_cframe * CFrame.new(0, 0, - (item.width / 2 + item.sidewalk_width / 2))).p),
-				{0, item.angle, 0},
-				{
-					color = {0.5, 0.5, 0.5},
-					surface = Enum.SurfaceType.SmoothNoOutlines,
-				})
+
+			local sections = {{ position = 0, length = 1 }}
+			for _, hole in ipairs(item.right_sidewalk_holes) do
+				-- draw.cframe(CFrame.new(item.pstart[1], item.sidewalk_elevation, item.pstart[2])
+				-- 	* vector.angled_cframe({0, item.angle, 0})
+				-- 	* CFrame.new(0, 0, item.width / 2 + item.sidewalk_width / 2)
+				-- 	* CFrame.new(-hole.position * item.length, 0, 0)
+				-- )
+				-- draw.cframe(CFrame.new(item.pstart[1], item.sidewalk_elevation, item.pstart[2])
+				-- 	* vector.angled_cframe({0, item.angle, 0})
+				-- 	* CFrame.new(0, 0, item.width / 2 + item.sidewalk_width / 2)
+				-- 	* CFrame.new(-(hole.position + hole.length) * item.length, 0, 0)
+				-- )
+				local target = -1
+				for i, v in ipairs(sections) do
+					if v.position <= hole.position and v.position + v.length > hole.position then
+						if hole.length + hole.position > v.position + v.length then
+							error('invalid hole: ' .. tostring(hole.position) .. ' - ' .. tostring(hole.length))
+						end
+						target = i
+						break
+					end
+				end
+
+				if target == -1 then
+					error('no matching section found: ' .. hole.length .. ", " .. hole.position)
+				end
+
+				local sec = table.remove(sections, target)
+				if sec.position < hole.position then
+					table.insert(sections, target, {
+						position = sec.position,
+						length = hole.position - sec.position,
+					})
+				end
+				if sec.position + sec.length > hole.position + hole.length then
+					table.insert(sections, target, {
+						position = hole.position + hole.length,
+						length = sec.position + sec.length - (hole.position + hole.length),
+					})
+				end
+			end
+
+			for _, sec in ipairs(sections) do
+				blueprint:add_part('sidewalk', {item.length * sec.length, item.thickness, item.sidewalk_width},
+					vector.vector3_to_table((
+						sidewalk_cframe * CFrame.new(-(sec.position + sec.length / 2 - 0.5) * item.length, 0, item.width / 2 + item.sidewalk_width / 2)
+					).p),
+					{0, item.angle, 0},
+					{
+						color = {0.5, 0.5, 0.5},
+						surface = Enum.SurfaceType.SmoothNoOutlines,
+					})
+			end
+
+			sections = {{ position = 0, length = 1 }}
+			for _, hole in ipairs(item.left_sidewalk_holes) do
+				local target = -1
+				for i, v in ipairs(sections) do
+					if v.position <= hole.position and v.position + v.length > hole.position then
+						if hole.length + hole.position > v.position + v.length then
+							error('invalid hole: ' .. tostring(hole.position) .. ' - ' .. tostring(hole.length))
+						end
+						target = i
+						break
+					end
+				end
+
+				if target == -1 then
+					error('no matching section found')
+				end
+
+				local sec = table.remove(sections, target)
+				if sec.position < hole.position then
+					table.insert(sections, target, {
+						position = sec.position,
+						length = hole.position - sec.position,
+					})
+				end
+				if sec.position + sec.length > hole.position + hole.length then
+					table.insert(sections, target, {
+						position = hole.position + hole.length,
+						length = sec.position + sec.length - (hole.position + hole.length),
+					})
+				end
+			end
+
+			for _, sec in ipairs(sections) do
+				blueprint:add_part('sidewalk', {item.length * sec.length, item.thickness, item.sidewalk_width},
+					vector.vector3_to_table((
+						sidewalk_cframe * CFrame.new(-(sec.position + sec.length / 2 - 0.5) * item.length, 0, - (item.width / 2 + item.sidewalk_width / 2))
+					).p),
+					{0, item.angle, 0},
+					{
+						color = {0.5, 0.5, 0.5},
+						surface = Enum.SurfaceType.SmoothNoOutlines,
+					})
+			end
 		end,
 	}, class_by_name 'hydros.CompiledBlueprint' .compile_functions),
 }

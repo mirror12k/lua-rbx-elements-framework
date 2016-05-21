@@ -154,12 +154,12 @@ local bp = new 'aeros.StreetBlueprint' ()
 -- bp:add_street({10, 10}, {-10, -10})
 -- bp:add_street({-10, 10}, {10, -10})
 
-bp:add_street({200, 200}, {-100, -200})
-bp:add_street({200, -80}, {-200, -20})
+-- bp:add_street({200, 200}, {-100, -200})
+-- bp:add_street({200, -80}, {-200, -20})
 
--- for _ = 1, 4 do
--- 	bp:add_street({math.random(0, 400), math.random(-400, 400)}, {math.random(-400, 0), math.random(-400, 400)})
--- end
+for _ = 1, 4 do
+	bp:add_street({math.random(0, 400), math.random(-400, 400)}, {math.random(-400, 0), math.random(-400, 400)})
+end
 
 bp:build({ cframe = CFrame.new(0, 1, 0) }).Parent = workspace
 
