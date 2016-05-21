@@ -103,6 +103,23 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 
 		self:add('street', data)
 	end,
+	merge_holes = function (self, holes)
+		local new_holes = {}
+		while #holes > 0 do
+			local hole = table.remove(holes, #holes)
+			for i = #holes, 1, -1 do
+				if hole.position >= holes[i].position and hole.position < holes[i].position + holes[i].length or
+						holes[i].position >= hole.position and holes[i].position < hole.position + hole.length then
+					local other = table.remove(holes, i)
+					hole.length = math.max(hole.position + hole.length, other.position + other.length)
+					hole.position = math.min(hole.position, other.position)
+					hole.length = hole.length - hole.position
+				end
+			end
+			new_holes[#new_holes + 1] = hole
+		end
+		return new_holes
+	end,
 	compile_functions = table_append({
 		street = function (self, blueprint, item, options)
 			blueprint:add_part('pavement', {item.length, item.thickness, item.width},
@@ -118,6 +135,7 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 					(item.pstart[2] + item.pend[2]) / 2
 				) * vector.angled_cframe({0, item.angle, 0})
 
+			item.right_sidewalk_holes = self:merge_holes(item.right_sidewalk_holes)
 			local sections = {{ position = 0, length = 1 }}
 			for _, hole in ipairs(item.right_sidewalk_holes) do
 				-- draw.cframe(CFrame.new(item.pstart[1], item.sidewalk_elevation, item.pstart[2])
@@ -172,6 +190,7 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 					})
 			end
 
+			item.left_sidewalk_holes = self:merge_holes(item.left_sidewalk_holes)
 			sections = {{ position = 0, length = 1 }}
 			for _, hole in ipairs(item.left_sidewalk_holes) do
 				local target = -1
