@@ -307,6 +307,45 @@ BuildingBlueprint = class 'aeros.BuildingBlueprint' {
 	_init = function (self, floors, length, width, name)
 		BuildingBlueprint.super._init(self, name)
 
+
+		local floor1_xholes = {}
+		for p = 10, width - 20, 20 do
+			if math.abs(p - width / 2) <= 10 then
+				floor1_xholes[#floor1_xholes + 1] = {
+					positionx = p / width,
+					lengthx = 10 / width,
+					positiony = 0,
+					lengthy = 0.8,
+				}
+			else
+				floor1_xholes[#floor1_xholes + 1] = {
+					positionx = p / width,
+					lengthx = 10 / width,
+					positiony = 0.3,
+					lengthy = 0.5,
+				}
+			end
+		end
+
+		local floor1_yholes = {}
+		for p = 10, length - 20, 20 do
+			if math.abs(p - length / 2) <= 10 then
+				floor1_yholes[#floor1_yholes + 1] = {
+					positionx = p / length,
+					lengthx = 10 / length,
+					positiony = 0,
+					lengthy = 0.8,
+				}
+			else
+				floor1_yholes[#floor1_yholes + 1] = {
+					positionx = p / length,
+					lengthx = 10 / length,
+					positiony = 0.3,
+					lengthy = 0.5,
+				}
+			end
+		end
+
 		local xholes = {}
 		for p = 10, width - 20, 20 do
 			xholes[#xholes + 1] = {
@@ -328,12 +367,21 @@ BuildingBlueprint = class 'aeros.BuildingBlueprint' {
 		end
 
 		for i = 1, floors do
-			self:add_blueprint(RoomBlueprint.new():add_room({0, 0}, length, width, {
-				north_wall = { holes = xholes },
-				south_wall = { holes = xholes },
-				east_wall = { holes = yholes },
-				west_wall = { holes = yholes },
-			}), 'floor' .. i, { position = {0, (i - 1) * 12, 0} })
+			if i == 1 then
+				self:add_blueprint(RoomBlueprint.new():add_room({0, 0}, length, width, {
+					north_wall = { holes = floor1_xholes },
+					south_wall = { holes = floor1_xholes },
+					east_wall = { holes = floor1_yholes },
+					west_wall = { holes = floor1_yholes },
+				}), 'floor' .. i, { position = {0, (i - 1) * 12, 0} })
+			else
+				self:add_blueprint(RoomBlueprint.new():add_room({0, 0}, length, width, {
+					north_wall = { holes = xholes },
+					south_wall = { holes = xholes },
+					east_wall = { holes = yholes },
+					west_wall = { holes = yholes },
+				}), 'floor' .. i, { position = {0, (i - 1) * 12, 0} })
+			end
 		end
 	end,
 }
