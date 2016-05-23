@@ -138,7 +138,7 @@ StreetBlueprint = class 'aeros.StreetBlueprint' {
 			end
 		end
 
-		self:add('street', data)
+		return self:add('street', data)
 	end,
 	compile_functions = table_append({
 		street = function (self, blueprint, item, options)
@@ -218,10 +218,11 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 		if options.ceiling ~= false then
 			self:add_floor({length, 1, width}, {position[1], 12 - 0.5, position[2]}, nil, options.ceiling)
 		end
+		return self
 	end,
 	add_wall = function (self, pstart, pend, options)
 		options = options or {}
-		self:add('wall', {
+		return self:add('wall', {
 			pstart = pstart,
 			pend = pend,
 			length = geometry.d2.distance_of_points(pstart, pend),
@@ -239,7 +240,7 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 	end,
 	add_floor = function (self, size, position, rotation, options)
 		options = options or {}
-		self:add('floor', {
+		return self:add('floor', {
 			size = size,
 			position = position,
 			rotation = rotation,
@@ -298,6 +299,45 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 		end,
 	}, class_by_name 'hydros.CompiledBlueprint' .compile_functions),
 }
+
+local BuildingBlueprint
+BuildingBlueprint = class 'aeros.BuildingBlueprint' {
+	_extends = class_by_name 'hydros.CompiledBlueprint',
+
+	_init = function (self, floors, length, width, name)
+		BuildingBlueprint.super._init(self, name)
+
+		local xholes = {}
+		for p = 10, width - 20, 20 do
+			xholes[#xholes + 1] = {
+				positionx = p / width,
+				lengthx = 10 / width,
+				positiony = 0.3,
+				lengthy = 0.5,
+			}
+		end
+
+		local yholes = {}
+		for p = 10, length - 20, 20 do
+			yholes[#yholes + 1] = {
+				positionx = p / length,
+				lengthx = 10 / length,
+				positiony = 0.3,
+				lengthy = 0.5,
+			}
+		end
+
+		for i = 1, floors do
+			self:add_blueprint(RoomBlueprint.new():add_room({0, 0}, length, width, {
+				north_wall = { holes = xholes },
+				south_wall = { holes = xholes },
+				east_wall = { holes = yholes },
+				west_wall = { holes = yholes },
+			}), 'floor' .. i, { position = {0, (i - 1) * 12, 0} })
+		end
+	end,
+}
+
 
 
 
