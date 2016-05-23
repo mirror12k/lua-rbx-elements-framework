@@ -38,8 +38,13 @@ local function merge_holes (holes)
 	return new_holes
 end
 
-local function holes_to_sections(holes)
-	local sections = {{ position = 0, length = 1 }}
+local function holes_to_sections(holes, sections)
+	if sections == nil then
+		sections = {{ position = 0, length = 1 }}
+	else
+		sections = table_deep_copy(sections)
+	end
+
 	for _, hole in ipairs(holes) do
 		local target = -1
 		for i, v in ipairs(sections) do
@@ -70,12 +75,17 @@ local function holes_to_sections(holes)
 			})
 		end
 	end
+	
 	return sections
 end
 
 
-local function holes_to_sections_d2(holes)
-	local sections = {{ positionx = 0, lengthx = 1, positiony = 0, lengthy = 1 }}
+local function holes_to_sections_d2(holes, sections)
+	if sections == nil then
+		sections = {{ positionx = 0, lengthx = 1, positiony = 0, lengthy = 1 }}
+	else
+		sections = table_deep_copy(sections)
+	end
 
 	for _, hole in ipairs(holes) do
 		local target = -1

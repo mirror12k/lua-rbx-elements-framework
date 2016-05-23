@@ -116,6 +116,36 @@ local function are_segments_inline (s1, s2)
 	return are_points_inline({0, 0}, unpack(local_s2))
 end
 
+local function are_segments_overlapping (s1, s2)
+	local local_s2 = to_object_space_all(s1[1], s1[2], s2)
+	if are_points_inline({0, 0}, unpack(local_s2)) == false then
+		return false
+	else
+		local d = distance_of_points(unpack(s2))
+		if (distance_of_points(s2[1], s1[1]) <= d or distance_of_points(s2[1], s1[2]) <= d)
+				and (distance_of_points(s2[2], s1[1]) <= d or distance_of_points(s2[2], s1[2]) <= d) then
+			return true
+		end
+	end
+	return false
+end
+
+local function join_overlapping_segments(s1, s2)
+	local points = {s1[1], s1[2], s2[1], s2[2]}
+	local best_dist = distance_of_points(s1[1], s2[1])
+	local best_pair = {s1[1], s2[1]}
+	for i = 1, #points do
+		for k = i + 1, #points do
+			local d = distance_of_points(points[i], points[k])
+			if d > best_dist then
+				best_dist = d
+				best_pair = {points[i], points[k]}
+			end
+		end
+	end
+	return best_pair
+end
+
 local function find_line_collision (l1, l2)
 
 	-- i don't like the slope-based solution for this, but it's simple enough, so i'll leave it for now
@@ -196,6 +226,8 @@ return export {
 			to_global_space_all = to_global_space_all,
 			are_points_inline = are_points_inline,
 			are_segments_inline = are_segments_inline,
+			are_segments_overlapping = are_segments_overlapping,
+			join_overlapping_segments = join_overlapping_segments,
 			find_line_collision = find_line_collision,
 			find_segment_collision = find_segment_collision,
 			offset_point = offset_point,
