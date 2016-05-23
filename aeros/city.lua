@@ -195,15 +195,29 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 		options = options or {}
 		options.thickness = options.thickness or self.thickness or 2
 
-		self:add_wall({position[1] + length / 2 - options.thickness / 2, position[2] + width / 2},
-			{position[1] + length / 2 - options.thickness / 2, position[2] - width / 2}, options.north_wall)
-		self:add_wall({position[1] -length / 2 + options.thickness / 2, position[2] + width / 2},
-			{position[1] -length / 2 + options.thickness / 2, position[2] - width / 2}, options.south_wall)
-		self:add_wall({position[1] + length / 2, position[2] + width / 2 - options.thickness / 2},
-			{position[1] -length / 2, position[2] + width / 2 - options.thickness / 2}, options.east_wall)
-		self:add_wall({position[1] + length / 2, position[2] -width / 2 + options.thickness / 2},
-			{position[1] -length / 2, position[2] -width / 2 + options.thickness / 2}, options.west_wall)
-		-- add_floor()
+		if options.north_wall ~= false then
+			self:add_wall({position[1] + length / 2 - options.thickness / 2, position[2] + width / 2},
+				{position[1] + length / 2 - options.thickness / 2, position[2] - width / 2}, options.north_wall)
+		end
+		if options.south_wall ~= false then
+			self:add_wall({position[1] -length / 2 + options.thickness / 2, position[2] + width / 2},
+				{position[1] -length / 2 + options.thickness / 2, position[2] - width / 2}, options.south_wall)
+		end
+		if options.east_wall ~= false then
+			self:add_wall({position[1] + length / 2, position[2] + width / 2 - options.thickness / 2},
+				{position[1] -length / 2, position[2] + width / 2 - options.thickness / 2}, options.east_wall)
+		end
+		if options.west_wall ~= false then
+			self:add_wall({position[1] + length / 2, position[2] -width / 2 + options.thickness / 2},
+				{position[1] -length / 2, position[2] -width / 2 + options.thickness / 2}, options.west_wall)
+		end
+
+		if options.floor ~= false then
+			self:add_floor({length, 1, width}, {position[1], 0.5, position[2]}, nil, options.floor)
+		end
+		if options.ceiling ~= false then
+			self:add_floor({length, 1, width}, {position[1], 12 - 0.5, position[2]}, nil, options.ceiling)
+		end
 	end,
 	add_wall = function (self, pstart, pend, options)
 		options = options or {}
@@ -229,6 +243,7 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 			size = size,
 			position = position,
 			rotation = rotation,
+			holes = options.holes,
 		})
 	end,
 
@@ -259,10 +274,27 @@ RoomBlueprint = class 'aeros.RoomBlueprint' {
 			end
 		end,
 		floor = function (self, blueprint, item, options)
-			blueprint:add_part('wall', item.size,
-				item.position,
-				{0, item.rotation, 0},
-				{})
+			local position = {item.position[1] - item.size[1] / 2, item.position[2], item.position[3] - item.size[3] / 2}
+			local sections
+
+			if item.holes ~= nil then
+				sections = spaceful.holes_to_sections_d2(item.holes)
+			else
+				sections = {{ positionx = 0, lengthx = 1, positiony = 0, lengthy = 1 }}
+			end
+
+			for _, sec in ipairs(sections) do
+				blueprint:add_part('floor', {item.size[1] * sec.lengthx, item.size[2], item.size[3] * sec.lengthy},
+					{
+						position[1] + item.size[1] * (sec.positionx + sec.lengthx / 2),
+						position[2],
+						position[3] + item.size[3] * (sec.positiony + sec.lengthy / 2)
+					},
+					{0, item.rotation or 0, 0},
+					{
+						surface = Enum.SurfaceType.SmoothNoOutlines,
+					})
+			end
 		end,
 	}, class_by_name 'hydros.CompiledBlueprint' .compile_functions),
 }

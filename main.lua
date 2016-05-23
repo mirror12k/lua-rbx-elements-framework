@@ -79,16 +79,16 @@ import 'aeros/aeros'
 -- bp:build({ cframe = CFrame.new(0, 1, 0) }).Parent = workspace
 
 
--- local bp = new 'aeros.RoomBlueprint' ()
--- -- bp:add_wall({9, 10}, {9, -10})
--- -- bp:add_wall({-9, 10}, {-9, -10})
--- -- bp:add_wall({10, 9}, {-10, 9})
--- -- bp:add_wall({10, -9}, {-10, -9})
--- -- bp:add_floor({20, 2, 20}, {0, 11, 0}, 0, {-10, -9})
+local bp = new 'aeros.RoomBlueprint' ()
+-- bp:add_wall({9, 10}, {9, -10})
+-- bp:add_wall({-9, 10}, {-9, -10})
+-- bp:add_wall({10, 9}, {-10, 9})
+-- bp:add_wall({10, -9}, {-10, -9})
+-- bp:add_floor({20, 2, 20}, {0, 11, 0}, 0, {-10, -9})
 
--- -- bp:add_room({0, 0}, 20, 20)
--- -- bp:add_room({10, 18}, 40, 20)
--- -- bp:add_room({10, 36}, 40, 20)
+bp:add_room({0, 0}, 20, 20, { ceiling = {holes = {{ positionx = 0.2, lengthx = 0.2, positiony = 0.25, lengthy = 0.5 }}} })
+bp:add_room({10, 20}, 40, 20)
+bp:add_room({10, 40}, 40, 20)
 
 -- bp:add_wall({0, 0}, {-50, 50}, { holes = {
 -- 	{ positionx = 0.2, lengthx = 0.2, positiony = 0.25, lengthy = 0.5 },
@@ -99,7 +99,7 @@ import 'aeros/aeros'
 -- 	{ positionx = 0.2, lengthx = 0.2, positiony = 0.6, lengthy = 0.2 },
 -- }})
 
--- bp:build().Parent = workspace
+bp:build().Parent = workspace
 
 -- print(geometry.d2.are_segments_overlapping({{10, 10}, {30, 30}}, {{20, 20}, {60, 60}}))
 -- print(geometry.d2.are_segments_overlapping({{10, 10}, {30, 30}}, {{40, 40}, {60, 60}}))
