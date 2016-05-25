@@ -1,0 +1,37 @@
+slime mountain
+game design document
+
+v0.1
+
+features:
+	randomly generated terrain
+		regenerated every <X> amount of time
+	sloped surface with slimes rolling down hill
+		slimes "eat" any block they touch that isn't another slime and isn't anchored
+	small protrusions in the "mountain" protect people can skew the paths of slimes
+	invisible checkpoints which summon slimes directly at people when crossed
+		per-player timer so that one player doesn't trigger it multiple times
+	density of slimes dependant on a perlin-noise function
+		size as well, and color probably as well
+	winners at the top of the mountain get special privledges
+		button to summon a big "king" slime
+			have the king slime spawn with a bunch of crowns in it's body already (which don't digest)
+		gun to shoot slimes into smaller slimes?
+		something to hinder other players?
+
+
+problems:
+	what are the incentives?
+		besides just climbing the mountain
+		gotta give an incentive which goes away upon dying
+		what incentive to climb up mountain AGAIN?
+			ability to shoot slimes?
+			ability to hinder other players?
+				would that breed assholes?
+	it's gotta be harder at the top than at the bottom
+		perhaps the protrusions would knock away more slimes by the bottom then at the top?
+		slimes may have some pretty tremendous speed by the bottom
+			might need some dampening
+	
+
+
