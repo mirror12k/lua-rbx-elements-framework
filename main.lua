@@ -21,6 +21,7 @@ end
 import 'lithos/lithos'
 import 'hydros/hydros'
 import 'aeros/aeros'
+import 'pyros/pyros'
 
 
 
@@ -192,4 +193,8 @@ import 'aeros/aeros'
 
 
 
-new 'aeros.CloudNoiseBlueprint' ('pillar_noise', {40, 100, 40}):build().Parent = workspace
+-- new 'aeros.CloudNoiseBlueprint' ('pillar_noise', {40, 100, 40}):build().Parent = workspace
+
+
+new 'pyros.SlimeBlueprint' (20, {80, 200, 80}):build({cframe = CFrame.new(0, 50, 0)}).Parent = workspace
+

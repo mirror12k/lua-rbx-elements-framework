@@ -140,6 +140,7 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 				p.LeftSurface = item.surface
 				p.RightSurface = item.surface
 			end
+			if item.shape ~= nil then p.Shape = item.shape end
 
 			return p
 		end,
@@ -208,6 +209,9 @@ ModelBlueprint = class 'hydros.ModelBlueprint' {
 						v.TopSurface ~= Enum.SurfaceType.Smooth
 						then
 					opts.surface = v.TopSurface.Value
+				end
+				if v.Shape ~= Enum.PartType.Block then
+					opts.shape = v.Shape
 				end
 				bp:add_part(v.Name, vector.vector3_to_table(v.Size), vector.vector3_to_table(v.Position), vector.vector3_to_table(v.Rotation), opts)
 			elseif v:IsA('Model') then
