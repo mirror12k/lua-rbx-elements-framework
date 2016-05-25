@@ -192,4 +192,4 @@ import 'aeros/aeros'
 
 
 
-new 'aeros.CloudNoiseBlueprint' ({40, 10, 40}):build().Parent = workspace
+new 'aeros.CloudNoiseBlueprint' ('pillar_noise', {40, 100, 40}):build().Parent = workspace
