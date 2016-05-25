@@ -17,11 +17,26 @@ else
 end
 
 import '../lithos/lithos'
-
-local exports = {}
-table_append(exports, import('city', 'import_list'))
-table_append(exports, import('military', 'import_list'))
+import '../hydros/hydros'
 
 
 
-return export(exports)
+
+local ConcreteBarrierBlueprint
+ConcreteBarrierBlueprint = class 'aeros.ConcreteBarrierBlueprint' {
+	_extends = class_by_name 'aeros.RoomBlueprint',
+
+	compile_functions = table_append({
+		wall = function (self, blueprint, item, options)
+			blueprint:add_part('wall', {item.length, item.height, item.thickness},
+				{ (item.pend[1] + item.pstart[1]) / 2, item.height / 2, (item.pend[2] + item.pstart[2]) / 2 },
+				{0, item.angle, 0},
+				{
+					surface = Enum.SurfaceType.SmoothNoOutlines,
+				})
+		end,
+	}, class_by_name 'hydros.CompiledBlueprint' .compile_functions),
+}
+
+
+return export {}

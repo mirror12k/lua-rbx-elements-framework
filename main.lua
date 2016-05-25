@@ -102,7 +102,6 @@ import 'aeros/aeros'
 -- bp:build().Parent = workspace
 
 
-new 'aeros.BuildingBlueprint' (5, 50, 110):build().Parent = workspace
 
 -- print(geometry.d2.are_segments_overlapping({{10, 10}, {30, 30}}, {{20, 20}, {60, 60}}))
 -- print(geometry.d2.are_segments_overlapping({{10, 10}, {30, 30}}, {{40, 40}, {60, 60}}))
@@ -177,5 +176,18 @@ new 'aeros.BuildingBlueprint' (5, 50, 110):build().Parent = workspace
 
 
 
+
+
+-- new 'aeros.BuildingBlueprint' (5, 50, 110):build().Parent = workspace
+
+local bp = new 'aeros.ConcreteBarrierBlueprint' ()
+bp.thickness = 6
+bp.height = 20
+
+bp
+	:add_wall({20, 20}, {20, -20})
+	:add_wall({20, -20}, {-20, -20})
+	:add_wall({-20, -20}, {-20, 20})
+	:build().Parent = workspace
 
 
