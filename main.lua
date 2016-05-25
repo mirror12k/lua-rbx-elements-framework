@@ -180,14 +180,16 @@ import 'aeros/aeros'
 
 -- new 'aeros.BuildingBlueprint' (5, 50, 110):build().Parent = workspace
 
-local bp = new 'aeros.ConcreteBarrierBlueprint' ()
-bp.thickness = 6
-bp.height = 20
+-- local bp = new 'aeros.ConcreteBarrierBlueprint' ()
+-- bp.thickness = 6
+-- bp.height = 20
 
-bp
-	:add_wall({20, 20}, {20, -20})
-	:add_wall({20, -20}, {-20, -20})
-	:add_wall({-20, -20}, {-20, 20})
-	:build().Parent = workspace
+-- bp
+-- 	:add_wall({20, 20}, {20, -20})
+-- 	:add_wall({20, -20}, {-20, -20})
+-- 	:add_wall({-20, -20}, {-20, 20})
+-- 	:build().Parent = workspace
 
 
+
+new 'aeros.CloudNoiseBlueprint' ({40, 10, 40}):build().Parent = workspace
