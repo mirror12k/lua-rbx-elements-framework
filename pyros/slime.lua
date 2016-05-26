@@ -21,6 +21,33 @@ import '../hydros/hydros'
 import '../aeros/aeros'
 
 
+
+
+local SlimeAI
+SlimeAI = class 'pyros.SlimeAI' {
+	_init = function (self, model)
+		self.model = model
+		self:hook()
+	end,
+	hook = function (self)
+		self.model.body.Touched:connect(function (other) self:touched(other) end)
+	end,
+	touched = function (self, other)
+		if self.model.Parent ~= nil and other ~= nil and other.Parent ~= nil then
+			if other.Anchored == false and other.Parent:FindFirstChild('ai_type') == nil then
+				other:BreakJoints()
+				other.Parent = self.model
+				block.weld(self.model.core, other)
+				timeout(function ()
+					other:Destroy()
+				end, 5)
+			end
+		end
+	end,
+}
+
+
+
 local SlimeBlueprint
 SlimeBlueprint = class 'pyros.SlimeBlueprint' {
 	_extends = 'hydros.ModelBlueprint',
@@ -40,6 +67,12 @@ SlimeBlueprint = class 'pyros.SlimeBlueprint' {
 			color = color,
 		})
 		self:add_weld('body', 'core')
+		self:add_value('ai_type', 'String', 'slime')
+	end,
+	build = function (self, ...)
+		local m = SlimeBlueprint.super.build(self, ...)
+		local ai = SlimeAI.new(m)
+		return m
 	end,
 }
 
