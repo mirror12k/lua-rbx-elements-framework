@@ -16,21 +16,38 @@ else
 	end
 end
 
+
 import 'module'
-import 'util'
-
-local exports = {}
-table_append(exports, import('debug', 'import_list'))
-table_append(exports, import('math', 'import_list'))
-table_append(exports, import('oop', 'import_list'))
-table_append(exports, import('stringy', 'import_list'))
-table_append(exports, import('test', 'import_list'))
-table_append(exports, import('util', 'import_list'))
-table_append(exports, import('freeze', 'import_list'))
-table_append(exports, import('thread', 'import_list'))
-
-table_append(exports, import('module', 'import_list'))
 
 
+local function cw(fun, ...)
+	return coroutine.wrap(fun)(...)
+end
 
-return export(exports)
+local function timeout_run(fun, delay, ...)
+	wait(delay)
+	fun(...)
+end
+
+local function timeout(fun, delay, ...)
+	return coroutine.wrap(timeout_run)(fun, delay, ...)
+end
+
+
+local function interval_run(fun, delay, times, ...)
+	for i = 1, times do
+		wait(delay)
+		fun(...)
+	end
+end
+
+local function interval(fun, delay, times, ...)
+	return coroutine.wrap(interval_run)(fun, delay, times, ...)
+end
+
+
+return export {
+	cw = cw,
+	timeout = timeout,
+	interval = interval,
+}
