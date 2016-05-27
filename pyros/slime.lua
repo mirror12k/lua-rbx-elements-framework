@@ -25,7 +25,8 @@ import '../aeros/aeros'
 
 local SlimeAI
 SlimeAI = class 'pyros.SlimeAI' {
-	_init = function (self, model)
+	_init = function (self, size, model)
+		self.size = size
 		self.model = model
 		self:hook()
 	end,
@@ -37,6 +38,8 @@ SlimeAI = class 'pyros.SlimeAI' {
 			if other.Anchored == false and other.Parent:FindFirstChild('ai_type') == nil then
 				other:BreakJoints()
 				other.Parent = self.model
+				other.CFrame = CFrame.new(self.model.core.Position + (other.Position - self.model.core.Position).unit * self.size / 3)
+					* vector.angled_cframe({math.random() * 360, math.random() * 360, math.random() * 360})
 				block.weld(self.model.core, other)
 				timeout(function ()
 					other:Destroy()
@@ -54,6 +57,7 @@ SlimeBlueprint = class 'pyros.SlimeBlueprint' {
 
 	_init = function (self, size, color, name)
 		SlimeBlueprint.super._init(self, name)
+		self.size = size
 		self:add_part('body', {size, size, size}, nil, nil, {
 			shape = Enum.PartType.Ball,
 			transparency = 0.6,
@@ -71,7 +75,7 @@ SlimeBlueprint = class 'pyros.SlimeBlueprint' {
 	end,
 	build = function (self, ...)
 		local m = SlimeBlueprint.super.build(self, ...)
-		local ai = SlimeAI.new(m)
+		local ai = SlimeAI.new(self.size, m)
 		return m
 	end,
 }
