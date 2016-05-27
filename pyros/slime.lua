@@ -41,10 +41,25 @@ SlimeAI = class 'pyros.SlimeAI' {
 				other.CFrame = CFrame.new(self.model.core.Position + (other.Position - self.model.core.Position).unit * self.size / 3)
 					* vector.angled_cframe({math.random() * 360, math.random() * 360, math.random() * 360})
 				block.weld(self.model.core, other)
-				timeout(function ()
-					other:Destroy()
-				end, 5)
+				-- this digesting operation is expensive and multiple parts can create massive processing costs
+				-- comment it out if the slimes are eating large amounts of parts
+				-- or perhaps fiddle with the constants
+				interval(self.digest_part, 1, 10, self, other)
+				timeout(self.finish_digesting_part, 10, self, other)
 			end
+		end
+	end,
+	digest_part = function (self, part)
+		if part.Parent ~= nil then
+			local cf = part.CFrame
+			part.Size = part.Size * 0.9
+			part.CFrame = cf
+			block.weld(self.model.core, part)
+		end
+	end,
+	finish_digesting_part = function (self, part)
+		if part.Parent ~= nil then
+			part:Destroy()
 		end
 	end,
 }
