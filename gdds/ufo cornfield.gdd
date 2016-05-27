@@ -1,0 +1,78 @@
+ufo cornfield
+game design document
+
+v0.1
+
+features:
+	a sterotypical disk-like UFO floating at a fixed height above the ground
+		UFO has a directed light as the abduction beam
+		UFO chases a single player of it's choosing
+			UFO is just a little bit faster than players to prevent endless loops
+			it can chase the average position of multiple players if it is far from anyone and the players are nearby
+		UFO forces any players in it's abduction cone to be slowly pulled up into it
+			captured players are then held captive for a certain period
+				maybe they should be transported to a seperate location and forced to escape laboriously?
+		UFO can be killed after a long amount of damage
+		UFO can charge then fire a central laser down onto buildings to destroy any cover from them
+			UFO has to sit still to charge
+			laser explosion obviously kills anyone in range
+		UFO displays a health bar up top when active, depletes as players do damage
+			make it flash red when really weak?
+	field is a big cornfield
+		mostly devoid of features
+		a beaten road along one edge of the road
+		a barn across the road from the cornfield
+		a shed?
+		a truck?
+		a harvester?
+		a hill?
+		UFO crater
+		dead tree?
+	before starting, there is a clearing in the center of the field from the crashed UFO
+		the crashed UFO is sitting in the crater
+		fire and smoke billows out of it
+			this will attract players to it
+		after a player approaches it, it slowly gets out of the crater and begins it's attack phase
+	players can find weapons crates scattered around with weapons and ammunition
+		mainly at various landmarks
+		aks and ammo for them
+			bullets have limited range to force players to get close
+			different parts of the UFO should take different damage
+				windows take more than the hull
+				abduction beam takes more than windows
+		occasional disposable missile launchers
+			can lock onto a target if pointing at it long enough
+			can't lock on when too far away
+				to force players to get close
+			non-locked missiles will fly straight
+				this allows players to train better skills
+			missiles do the same damage regardless of where they hit
+		very rare sniper rifles?
+			would have much longer range than AKs
+			would allow scoped shots
+			low on ammo
+		should air-dropped crates be a thing?
+			it would help resource scarcity
+			it would force players to move and not sit around
+		need to constantly work towards getting players closer to the UFO so that running away to seperate corners isn't really an option
+	rare flak cannons are positioned in strategic locations
+		after a certain amount of damage, the UFO will try to destroy it directly with a laser beam (or destroy the platform it's on)
+		flak cannon has large range but hard to aim (using wasd)
+		hits on the UFO will slow it down and create clouds of smoke
+		damage percentage same as AK
+	score is decided by damage dealt
+		calculated after a round is over
+	should we have a vitality based sprint?
+		allows players more time to get away
+		should recover VERY slowly
+			faster if the player is standing still
+			slower if the player is aiming/shooting
+		can't fire weapons while sprinting
+
+
+
+problems:
+	what does a player do when he is being chased?
+		can agro be transfered based on damage dealt?
+	what rewards should there be for getting a good score the previous round?
+	could players play as the aliens somehow?
