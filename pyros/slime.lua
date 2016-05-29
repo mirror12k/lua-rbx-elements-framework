@@ -108,6 +108,9 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 		self.angle = angle
 		self.thickness = 20
 
+		self.offset = geometry.d2.offset_dist(self.angle - 180, self.thickness / 2)
+		self.pdelta = geometry.d2.offset_dist(self.angle, self.length)
+
 		self.holes = {}
 	end,
 	add_hole = function (self, positionx, lengthx, positiony, lengthy)
@@ -119,20 +122,24 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 		}
 		return self
 	end,
+	add_mountain_step = function (self, positionx, lengthx, positiony, lengthy)
+		self:add_hole(positionx, lengthx, positiony, lengthy)
+		return self:add('mountain_step', {
+			positionx = positionx,
+			lengthx = lengthx,
+			positiony = positiony,
+			lengthy = lengthy,
+		})
+	end,
 	compile_self = function (self, ...)
-		local bp = SlimeMountainBlueprint.super.compile_self(self, ...)
-
-
-		local pdelta = geometry.d2.offset_dist(self.angle, self.length)
-		local offset = geometry.d2.offset_dist(self.angle - 180, self.thickness / 2)
+		local blueprint = SlimeMountainBlueprint.super.compile_self(self, ...)
 
 		local sections = spaceful.holes_to_sections_d2(self.holes)
-
 		for _, sec in ipairs(sections) do
-			bp:add_part('mountain_slope', {self.length * sec.lengthx, self.thickness, self.width * sec.lengthy},
+			blueprint:add_part('mountain_slope', {self.length * sec.lengthx, self.thickness, self.width * sec.lengthy},
 				{
-					offset[1] + pdelta[1] * (sec.positionx + sec.lengthx / 2),
-					offset[2] + pdelta[2] * (sec.positionx + sec.lengthx / 2),
+					self.offset[1] + self.pdelta[1] * (sec.positionx + sec.lengthx / 2),
+					self.offset[2] + self.pdelta[2] * (sec.positionx + sec.lengthx / 2),
 					self.width * (sec.positiony + sec.lengthy / 2),
 				},
 				{0, 0, self.angle},
@@ -140,8 +147,25 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
 		end
-		return bp
+		return blueprint
 	end,
+
+	compile_functions = table_append({
+		mountain_step = function (self, blueprint, item, options)
+			local size = geometry.d2.offset_dist(self.angle, item.lengthx * self.length)
+			local slope_offset = geometry.d2.offset_dist(self.angle + 90, self.thickness / 2)
+			blueprint:add_part('step', {size[1], self.thickness, item.lengthy * self.width},
+				{
+					slope_offset[1] + self.offset[1] + self.pdelta[1] * item.positionx + size[1] / 2,
+					slope_offset[2] + self.offset[2] + self.pdelta[2] * item.positionx - self.thickness / 2,
+					self.width * (item.positiony + item.lengthy / 2),
+				},
+				nil,
+				{
+					surface = Enum.SurfaceType.SmoothNoOutlines,
+				})
+		end,
+	}, class_by_name 'hydros.CompiledBlueprint' .compile_functions),
 }
 
 
