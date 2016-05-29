@@ -164,6 +164,16 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				{
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
+			blueprint:add_part('step', {size[2], self.thickness, item.lengthy * self.width},
+				{
+					slope_offset[1] + self.offset[1] + self.pdelta[1] * (item.positionx + item.lengthx) + self.thickness / 2,
+					slope_offset[2] + self.offset[2] + self.pdelta[2] * (item.positionx + item.lengthx) - size[2] / 2,
+					self.width * (item.positiony + item.lengthy / 2),
+				},
+				{0, 0, 90},
+				{
+					surface = Enum.SurfaceType.SmoothNoOutlines,
+				})
 		end,
 	}, class_by_name 'hydros.CompiledBlueprint' .compile_functions),
 }
