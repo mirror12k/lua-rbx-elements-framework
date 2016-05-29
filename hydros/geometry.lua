@@ -197,6 +197,11 @@ end
 
 
 
+
+local function offset_dist(angle, dist)
+	return {dist * math.cos(math.rad(angle)), dist * math.sin(math.rad(angle))}
+end
+
 local function offset_point(p, angle, dist)
 	return {p[1] + dist * math.cos(math.rad(angle)), p[2] + dist * math.sin(math.rad(angle))}
 end
@@ -230,6 +235,7 @@ return export {
 			join_overlapping_segments = join_overlapping_segments,
 			find_line_collision = find_line_collision,
 			find_segment_collision = find_segment_collision,
+			offset_dist = offset_dist,
 			offset_point = offset_point,
 			offset_segment = offset_segment,
 		},

@@ -101,12 +101,46 @@ local SlimeMountainBlueprint
 SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 	_extends = 'hydros.CompiledBlueprint',
 	
-	_init = function (self, name)
-		SlimeMountainBlueprint.super._init(name)
+	_init = function (self, width, length, angle, name)
+		SlimeMountainBlueprint.super._init(self, name)
+		self.width = width
+		self.length = length
+		self.angle = angle
+		self.thickness = 20
+
+		self.holes = {}
+	end,
+	add_hole = function (self, positionx, lengthx, positiony, lengthy)
+		self.holes[#self.holes + 1] = {
+			positionx = positionx,
+			lengthx = lengthx,
+			positiony = positiony,
+			lengthy = lengthy,
+		}
+		return self
 	end,
 	compile_self = function (self, ...)
 		local bp = SlimeMountainBlueprint.super.compile_self(self, ...)
-		
+
+
+		local pdelta = geometry.d2.offset_dist(self.angle, self.length)
+		local offset = geometry.d2.offset_dist(self.angle - 180, self.thickness / 2)
+
+		local sections = spaceful.holes_to_sections_d2(self.holes)
+
+		for _, sec in ipairs(sections) do
+			bp:add_part('mountain_slope', {self.length * sec.lengthx, self.thickness, self.width * sec.lengthy},
+				{
+					offset[1] + pdelta[1] * (sec.positionx + sec.lengthx / 2),
+					offset[2] + pdelta[2] * (sec.positionx + sec.lengthx / 2),
+					self.width * (sec.positiony + sec.lengthy / 2),
+				},
+				{0, 0, self.angle},
+				{
+					surface = Enum.SurfaceType.SmoothNoOutlines,
+				})
+		end
+		return bp
 	end,
 }
 
