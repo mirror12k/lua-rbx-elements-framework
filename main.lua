@@ -197,9 +197,9 @@ import 'pyros/pyros'
 
 
 -- new 'pyros.SlimeBlueprint' (20, {80, 200, 80}):build({cframe = CFrame.new(0, 50, 0)}).Parent = workspace
-new 'pyros.slime.SlimeMountainBlueprint' (100, 100, 45)
-	:add_mountain_step(0.2, 0.4, 0, 0.5)
-	:add_mountain_step(0.7, 0.3, 0.8, 0.2)
-	:build().Parent = workspace
+-- new 'pyros.slime.SlimeMountainBlueprint' (100, 100, 45)
+-- 	:add_mountain_step(0.2, 0.4, 0, 0.5)
+-- 	:add_mountain_step(0.7, 0.3, 0.8, 0.2)
+-- 	:build().Parent = workspace
 
-
+slime_mountain_generator(100, 500, 30):build().Parent = workspace

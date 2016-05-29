@@ -180,8 +180,33 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 
 
 
+function slime_mountain_generator (width, length, angle)
+	local blueprint = new 'pyros.slime.SlimeMountainBlueprint' (width, length, angle)
+
+	local offset = 20
+	while offset < length do
+		local step_length = math.random(10, 20)
+		if offset + step_length < length then
+			local step_width_1, step_width_2 = math.random(0, width), math.random(0, width)
+			if step_width_1 > step_width_2 then
+				local store = step_width_1
+				step_width_1 = step_width_2
+				step_width_2 = store
+			end
+			if step_width_1 ~= step_width_2 then
+				blueprint:add_mountain_step(offset / length, step_length / length, step_width_1 / width, (step_width_2 - step_width_1) / width)
+			end
+		end
+		offset = offset + step_length + math.random(0, 40)
+	end
+
+	return blueprint
+end
+
+
+
 
 
 return export {
-	
+	slime_mountain_generator = slime_mountain_generator,
 }
