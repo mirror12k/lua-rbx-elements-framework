@@ -97,6 +97,23 @@ SlimeBlueprint = class 'pyros.SlimeBlueprint' {
 
 
 
+local SlimeMountainBlueprint
+SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
+	_extends = 'hydros.CompiledBlueprint',
+	
+	_init = function (self, name)
+		SlimeMountainBlueprint.super._init(name)
+	end,
+	compile_self = function (self, ...)
+		local bp = SlimeMountainBlueprint.super.compile_self(self, ...)
+		
+	end,
+}
+
+
+
+
+
 return export {
 	
 }
