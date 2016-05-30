@@ -21,6 +21,10 @@ features:
 				need to make it at least semi realistic
 			rivers maybe?
 			steep pillars which force platforming on the players, but the slimes can easily eat you while you are platforming them
+			as an easter egg: one of them will have an inconspicuous door which only opens on left clicking it
+				could have some meager prize or something inside
+				a radio would be positioned at the top of the winner's platform
+					when clicked would give back two floats pointing to it's location on the mountain
 	invisible checkpoints which summon slimes directly at people when crossed
 		per-player timer so that one player doesn't trigger it multiple times
 	density of slimes dependant on a perlin-noise function
@@ -33,6 +37,13 @@ features:
 			only a direct hit will break up a slime
 			smaller slimes get further killed
 			no team-killing, but able to kill self with it
+		freeze ray
+			slow firing
+			freezes a slime in place for 10 seconds
+				alternatively, it encases the slime in large ice blocks
+					this allows the slime to [awkwardly] continue rolling down the hill
+					prevents slimes from eating people, but can still knock them down the hill
+					slowly melts off
 		something to hinder other players?
 
 
