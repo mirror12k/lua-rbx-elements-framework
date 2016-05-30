@@ -168,8 +168,8 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 			local slope_offset = geometry.d2.offset_dist(self.angle + 90, self.thickness / 2)
 			blueprint:add_part('step', {size[1], self.thickness, item.lengthy * self.width},
 				{
-					slope_offset[1] + self.offset[1] + self.pdelta[1] * item.positionx + size[1] / 2,
-					slope_offset[2] + self.offset[2] + self.pdelta[2] * item.positionx - self.thickness / 2,
+					self.pdelta[1] * item.positionx + size[1] / 2,
+					self.pdelta[2] * item.positionx - self.thickness / 2,
 					self.width * (item.positiony + item.lengthy / 2),
 				},
 				nil,
@@ -178,8 +178,8 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				})
 			blueprint:add_part('step', {size[2], self.thickness, item.lengthy * self.width},
 				{
-					slope_offset[1] + self.offset[1] + self.pdelta[1] * (item.positionx + item.lengthx) + self.thickness / 2,
-					slope_offset[2] + self.offset[2] + self.pdelta[2] * (item.positionx + item.lengthx) - size[2] / 2,
+					self.pdelta[1] * (item.positionx + item.lengthx) + self.thickness / 2,
+					self.pdelta[2] * (item.positionx + item.lengthx) - size[2] / 2,
 					self.width * (item.positiony + item.lengthy / 2),
 				},
 				{0, 0, 90},
@@ -218,7 +218,7 @@ end
 
 function generate_slime_wave(width, size, cf, parent)
 	for i = 0, width, size do
-		new 'pyros.SlimeBlueprint' (size, 2 * (4/3) * math.pi * size^3 ) -- formula of a sphere
+		new 'pyros.SlimeBlueprint' (size, 3 * (4/3) * math.pi * size^3 ) -- formula of a sphere
 			:build({ cframe = cf * CFrame.new(0, 0, i) }).Parent = parent
 	end
 end
