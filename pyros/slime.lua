@@ -108,7 +108,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 		self.angle = angle
 		self.thickness = 20
 
-		self.offset = geometry.d2.offset_dist(self.angle - 180, self.thickness / 2)
+		self.offset = geometry.d2.offset_dist(self.angle - 90, self.thickness / 2)
 		self.pdelta = geometry.d2.offset_dist(self.angle, self.length)
 
 		self.holes = {}
