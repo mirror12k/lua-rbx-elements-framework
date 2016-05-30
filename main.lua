@@ -205,4 +205,4 @@ import 'pyros/pyros'
 local mountain = slime_mountain_generator(100, 500, 30)
 mountain:build().Parent = workspace
 
-start_mountain_slime_waves(100, 5, workspace, mountain:get_top_edge())
+start_mountain_slime_waves(100, 10, workspace, mountain:get_top_edge())

@@ -70,9 +70,11 @@ local SlimeBlueprint
 SlimeBlueprint = class 'pyros.SlimeBlueprint' {
 	_extends = 'hydros.ModelBlueprint',
 
-	_init = function (self, size, color, name)
+	_init = function (self, size, dampening, color, name)
 		SlimeBlueprint.super._init(self, name)
 		self.size = size
+		self.dampening = dampening
+
 		self:add_part('body', {size, size, size}, nil, nil, {
 			shape = Enum.PartType.Ball,
 			transparency = 0.6,
@@ -91,6 +93,12 @@ SlimeBlueprint = class 'pyros.SlimeBlueprint' {
 	build = function (self, ...)
 		local m = SlimeBlueprint.super.build(self, ...)
 		local ai = SlimeAI.new(self.size, m)
+		if self.dampening ~= nil then
+			local f = Instance.new('BodyVelocity')
+			f.Velocity = Vector3.new(0,0,0)
+			f.MaxForce = Vector3.new(self.dampening, self.dampening, self.dampening)
+			f.Parent = m.core
+		end
 		return m
 	end,
 }
@@ -210,7 +218,8 @@ end
 
 function generate_slime_wave(width, size, cf, parent)
 	for i = 0, width, size do
-		new 'pyros.SlimeBlueprint'(size):build({ cframe = cf * CFrame.new(0, 0, i) }).Parent = parent
+		new 'pyros.SlimeBlueprint' (size, 2 * (4/3) * math.pi * size^3 ) -- formula of a sphere
+			:build({ cframe = cf * CFrame.new(0, 0, i) }).Parent = parent
 	end
 end
 
