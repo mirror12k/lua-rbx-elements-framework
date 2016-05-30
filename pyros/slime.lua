@@ -113,6 +113,10 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 
 		self.holes = {}
 	end,
+
+	get_top_edge = function (self)
+		return {self.pdelta[1] + self.offset[1], self.pdelta[2] + self.offset[2], 0}
+	end,
 	add_hole = function (self, positionx, lengthx, positiony, lengthy)
 		self.holes[#self.holes + 1] = {
 			positionx = positionx,
@@ -204,9 +208,19 @@ function slime_mountain_generator (width, length, angle)
 end
 
 
+function generate_slime_wave(width, size, cf, parent)
+	for i = 0, width, size do
+		new 'pyros.SlimeBlueprint'(size):build({ cframe = cf * CFrame.new(0, 0, i) }).Parent = parent
+	end
+end
 
+
+function start_mountain_slime_waves(width, size, parent, offset)
+	interval(generate_slime_wave, 5, 1000, width, size, CFrame.new(offset[1] - size * 2, offset[2] + size * 2, offset[3]), parent)
+end
 
 
 return export {
 	slime_mountain_generator = slime_mountain_generator,
+	start_mountain_slime_waves = start_mountain_slime_waves,
 }

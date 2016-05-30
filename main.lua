@@ -202,4 +202,7 @@ import 'pyros/pyros'
 -- 	:add_mountain_step(0.7, 0.3, 0.8, 0.2)
 -- 	:build().Parent = workspace
 
-slime_mountain_generator(100, 500, 30):build().Parent = workspace
+local mountain = slime_mountain_generator(100, 500, 30)
+mountain:build().Parent = workspace
+
+-- start_mountain_slime_waves(100, 5, workspace, mountain:get_top_edge())
