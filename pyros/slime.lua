@@ -134,13 +134,15 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 		}
 		return self
 	end,
-	add_mountain_step = function (self, positionx, lengthx, positiony, lengthy)
+	add_mountain_step = function (self, positionx, lengthx, positiony, lengthy, depthx, depthy)
 		self:add_hole(positionx, lengthx, positiony, lengthy)
 		return self:add('mountain_step', {
 			positionx = positionx,
 			lengthx = lengthx,
 			positiony = positiony,
 			lengthy = lengthy,
+			depthx = depthx or 1,
+			depthy = depthy or 1,
 		})
 	end,
 	compile_self = function (self, ...)
@@ -165,24 +167,33 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 	compile_functions = table_append({
 		mountain_step = function (self, blueprint, item, options)
 			local size = geometry.d2.offset_dist(self.angle, item.lengthx * self.length)
-			local slope_offset = geometry.d2.offset_dist(self.angle + 90, self.thickness / 2)
-			blueprint:add_part('step', {size[1], self.thickness, item.lengthy * self.width},
+			size[1] = size[1] * item.depthx
+			size[2] = size[2] * item.depthy
+
+			local pstart = { self.pdelta[1] * item.positionx, self.pdelta[2] * item.positionx }
+			local pend = { self.pdelta[1] * (item.positionx + item.lengthx), self.pdelta[2] * (item.positionx + item.lengthx) }
+			local pmid = { pstart[1] + size[1], pend[2] - size[2] }
+
+
+			local s1 = geometry.d2.offset_segment({pstart, pmid}, -90, self.thickness / 2)
+			local s2 = geometry.d2.offset_segment({pmid, pend}, -90, self.thickness / 2)
+			blueprint:add_part('step', {geometry.d2.distance_of_points(unpack(s1)), self.thickness, item.lengthy * self.width},
 				{
-					self.pdelta[1] * item.positionx + size[1] / 2,
-					self.pdelta[2] * item.positionx - self.thickness / 2,
+					(s1[1][1] + s1[2][1]) / 2,
+					(s1[1][2] + s1[2][2]) / 2,
 					self.width * (item.positiony + item.lengthy / 2),
 				},
-				nil,
+				{0, 0, geometry.d2.angle_of_points(unpack(s1))},
 				{
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
-			blueprint:add_part('step', {size[2], self.thickness, item.lengthy * self.width},
+			blueprint:add_part('step', {geometry.d2.distance_of_points(unpack(s2)), self.thickness, item.lengthy * self.width},
 				{
-					self.pdelta[1] * (item.positionx + item.lengthx) + self.thickness / 2,
-					self.pdelta[2] * (item.positionx + item.lengthx) - size[2] / 2,
+					(s2[1][1] + s2[2][1]) / 2,
+					(s2[1][2] + s2[2][2]) / 2,
 					self.width * (item.positiony + item.lengthy / 2),
 				},
-				{0, 0, 90},
+				{0, 0, geometry.d2.angle_of_points(unpack(s2))},
 				{
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
@@ -206,7 +217,9 @@ function slime_mountain_generator (width, length, angle)
 				step_width_2 = store
 			end
 			if step_width_1 ~= step_width_2 then
-				blueprint:add_mountain_step(offset / length, step_length / length, step_width_1 / width, (step_width_2 - step_width_1) / width)
+				blueprint:add_mountain_step(
+					offset / length, step_length / length, step_width_1 / width, (step_width_2 - step_width_1) / width,
+					math.random(75, 150) * 0.01, math.random(75, 150) * 0.01)
 			end
 		end
 		offset = offset + step_length + math.random(0, 40)
