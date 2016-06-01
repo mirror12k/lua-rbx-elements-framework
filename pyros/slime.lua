@@ -143,6 +143,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 			lengthy = lengthy,
 			depthx = depthx or 1,
 			depthy = depthy or 1,
+			bank_left = { angle = 15 },
 		})
 	end,
 	compile_self = function (self, ...)
@@ -199,14 +200,21 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				})
 			if item.bank_left ~= nil then
 				local l = item.lengthx * self.length
-				local d = geometry.d2.offset_dist(item.bank_left.angle, l)[2]
-				blueprint:add_part('step_bank', {geometry.d2.distance_of_points(unpack(s2)), self.thickness, item.lengthy * self.width},
-					{
-						(s2[1][1] + s2[2][1]) / 2,
-						(s2[1][2] + s2[2][2]) / 2,
-						self.width * (item.positiony),
-					},
-					{0, 0, geometry.d2.angle_of_points(unpack(s2))},
+				local width = geometry.d2.offset_dist(item.bank_left.angle, l)[2]
+				local length = geometry.d2.dist_from_x(item.bank_left.angle, l)
+
+				local offset_front = geometry.d2.offset_dist(item.bank_left.angle, length)[2]
+
+				local pback = { pstart[1], pstart[2], self.width * item.positiony }
+				local pfront = { pend[1], pend[2], self.width * item.positiony + offset_front }
+
+				local cf = CFrame.new(unpack(pback)) * vector.angled_cframe({0, 0, self.angle}) * vector.angled_cframe({0, -item.bank_left.angle, 0})
+				cf = cf * CFrame.new(length / 2, - self.thickness / 2, - width / 2)
+
+				-- draw.axis(vector.table_to_vector3(pback), vector.table_to_vector3(pfront))
+				blueprint:add_part('step_bank', {length, self.thickness, width},
+					vector.vector3_to_table(cf.p),
+					vector.angles_from_cframe(cf),
 					{
 						surface = Enum.SurfaceType.SmoothNoOutlines,
 					})
