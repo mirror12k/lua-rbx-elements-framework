@@ -279,16 +279,25 @@ function slime_mountain_generator (width, length, angle)
 end
 
 
-function generate_slime_wave(width, size, cf, parent)
+
+function generate_slime_wave(width, size, cf, parent, tick_fun)
+	local tick = tick_fun()
 	for i = 0, width, size do
-		new 'pyros.SlimeBlueprint' (size, 3 * (4/3) * math.pi * size^3 ) -- formula of a sphere
-			:build({ cframe = cf * CFrame.new(0, 0, i) }).Parent = parent
+		if math.noise(tick, 15678.215, i / 0.1) > 0 then
+			new 'pyros.SlimeBlueprint' (size, 3 * (4/3) * math.pi * size^3 ) -- formula of a sphere
+				:build({ cframe = cf * CFrame.new(0, 0, i) }).Parent = parent
+		end
 	end
 end
 
 
 function start_mountain_slime_waves(width, size, parent, offset)
-	interval(generate_slime_wave, 5, 1000, width, size, CFrame.new(offset[1] - size * 2, offset[2] + size * 2, offset[3]), parent)
+	local tick = 0.1
+	interval(generate_slime_wave, 1, 1000, width, size, CFrame.new(offset[1] - size * 2, offset[2] + size * 2, offset[3]), parent,
+		function ()
+			tick = tick + 0.1
+			return tick
+		end)
 end
 
 
