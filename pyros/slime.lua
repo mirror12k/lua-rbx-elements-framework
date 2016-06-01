@@ -285,7 +285,7 @@ function generate_slime_wave(width, size, cf, parent, tick_fun)
 	for i = 0, width, size do
 		if math.noise(tick, 15678.215, i / 0.1) > 0 then
 			new 'pyros.SlimeBlueprint' (size, 3 * (4/3) * math.pi * size^3 ) -- formula of a sphere
-				:build({ cframe = cf * CFrame.new(0, 0, i) }).Parent = parent
+				:build({ cframe = cf * CFrame.new(0, math.random() * size, i + (math.random() - 0.5) * size ) }).Parent = parent
 		end
 	end
 end
