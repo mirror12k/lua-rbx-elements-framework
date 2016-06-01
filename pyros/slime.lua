@@ -95,7 +95,7 @@ SlimeBlueprint = class 'pyros.SlimeBlueprint' {
 		local ai = SlimeAI.new(self.size, m)
 		if self.dampening ~= nil then
 			local f = Instance.new('BodyVelocity')
-			f.Velocity = Vector3.new(0,0,0)
+			f.Velocity = Vector3.new(-10,0,0)
 			f.MaxForce = Vector3.new(self.dampening, self.dampening, self.dampening)
 			f.Parent = m.core
 		end
@@ -134,16 +134,17 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 		}
 		return self
 	end,
-	add_mountain_step = function (self, positionx, lengthx, positiony, lengthy, depthx, depthy)
+	add_mountain_step = function (self, positionx, lengthx, positiony, lengthy, opts)
 		self:add_hole(positionx, lengthx, positiony, lengthy)
 		return self:add('mountain_step', {
 			positionx = positionx,
 			lengthx = lengthx,
 			positiony = positiony,
 			lengthy = lengthy,
-			depthx = depthx or 1,
-			depthy = depthy or 1,
-			bank_left = { angle = 15 },
+			depthx = opts.depthx or 1,
+			depthy = opts.depthy or 1,
+			bank_left = opts.bank_left,
+			bank_right = opts.bank_right,
 		})
 	end,
 	compile_self = function (self, ...)
@@ -219,6 +220,27 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 						surface = Enum.SurfaceType.SmoothNoOutlines,
 					})
 			end
+			if item.bank_right ~= nil then
+				local l = item.lengthx * self.length
+				local width = geometry.d2.offset_dist(item.bank_right.angle, l)[2]
+				local length = geometry.d2.dist_from_x(item.bank_right.angle, l)
+
+				local offset_front = geometry.d2.offset_dist(item.bank_right.angle, length)[2]
+
+				local pback = { pstart[1], pstart[2], self.width * (item.positiony + item.lengthy) }
+				local pfront = { pend[1], pend[2], self.width * (item.positiony + item.lengthy) - offset_front }
+
+				local cf = CFrame.new(unpack(pback)) * vector.angled_cframe({0, 0, self.angle}) * vector.angled_cframe({0, item.bank_left.angle, 0})
+				cf = cf * CFrame.new(length / 2, - self.thickness / 2, width / 2)
+
+				-- draw.axis(vector.table_to_vector3(pback), vector.table_to_vector3(pfront))
+				blueprint:add_part('step_bank', {length, self.thickness, width},
+					vector.vector3_to_table(cf.p),
+					vector.angles_from_cframe(cf),
+					{
+						surface = Enum.SurfaceType.SmoothNoOutlines,
+					})
+			end
 		end,
 	}, class_by_name 'hydros.CompiledBlueprint' .compile_functions),
 }
@@ -239,12 +261,18 @@ function slime_mountain_generator (width, length, angle)
 				step_width_2 = store
 			end
 			if step_width_1 ~= step_width_2 then
+				local bank_angle = math.random(5, 45)
 				blueprint:add_mountain_step(
 					offset / length, step_length / length, step_width_1 / width, (step_width_2 - step_width_1) / width,
-					math.random(75, 120) * 0.01, math.random(75, 120) * 0.01)
+					{
+						depthx = math.random(75, 120) * 0.01,
+						depthy = math.random(75, 120) * 0.01,
+						bank_left = { angle = bank_angle },
+						bank_right = { angle = bank_angle },
+					})
 			end
 		end
-		offset = offset + step_length + math.random(0, 40)
+		offset = offset + step_length + math.random(5, 25)
 	end
 
 	return blueprint

@@ -57,6 +57,15 @@ function draw.line(vec1, vec2, color, parent)
 	return p
 end
 
+
+function draw.axis(vec1, vec2, color, parent)
+	local distance = (vec1 - vec2).magnitude
+	local p = block.block_from_cframe('line', {2000, 0.2, 0.2}, CFrame.new(vec1) * vector.directional_offset_cframe(vec2 - vec1, distance/2))
+	p.Parent = parent or workspace
+	if color then p.BrickColor = BrickColor.new(vector.table_to_color3(color)) end
+	return p
+end
+
 return export {
 	draw = draw,
 }
