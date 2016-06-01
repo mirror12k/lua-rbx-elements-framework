@@ -187,7 +187,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				{
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
-			blueprint:add_part('step', {geometry.d2.distance_of_points(unpack(s2)), self.thickness, item.lengthy * self.width},
+			blueprint:add_part('step_wall', {geometry.d2.distance_of_points(unpack(s2)), self.thickness, item.lengthy * self.width},
 				{
 					(s2[1][1] + s2[2][1]) / 2,
 					(s2[1][2] + s2[2][2]) / 2,
@@ -197,6 +197,20 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				{
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
+			if item.bank_left ~= nil then
+				local l = item.lengthx * self.length
+				local d = geometry.d2.offset_dist(item.bank_left.angle, l)[2]
+				blueprint:add_part('step_bank', {geometry.d2.distance_of_points(unpack(s2)), self.thickness, item.lengthy * self.width},
+					{
+						(s2[1][1] + s2[2][1]) / 2,
+						(s2[1][2] + s2[2][2]) / 2,
+						self.width * (item.positiony),
+					},
+					{0, 0, geometry.d2.angle_of_points(unpack(s2))},
+					{
+						surface = Enum.SurfaceType.SmoothNoOutlines,
+					})
+			end
 		end,
 	}, class_by_name 'hydros.CompiledBlueprint' .compile_functions),
 }
@@ -219,7 +233,7 @@ function slime_mountain_generator (width, length, angle)
 			if step_width_1 ~= step_width_2 then
 				blueprint:add_mountain_step(
 					offset / length, step_length / length, step_width_1 / width, (step_width_2 - step_width_1) / width,
-					math.random(75, 150) * 0.01, math.random(75, 150) * 0.01)
+					math.random(75, 120) * 0.01, math.random(75, 120) * 0.01)
 			end
 		end
 		offset = offset + step_length + math.random(0, 40)
