@@ -204,13 +204,15 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				local width = geometry.d2.offset_dist(item.bank_left.angle, l)[2]
 				local length = geometry.d2.dist_from_x(item.bank_left.angle, l)
 
-				local offset_front = geometry.d2.offset_dist(item.bank_left.angle, length)[2]
+				-- local offset_front = geometry.d2.offset_dist(item.bank_left.angle, length)[2]
 
 				local pback = { pstart[1], pstart[2], self.width * item.positiony }
-				local pfront = { pend[1], pend[2], self.width * item.positiony + offset_front }
+				-- local pfront = { pend[1], pend[2], self.width * item.positiony + offset_front }
 
-				local cf = CFrame.new(unpack(pback)) * vector.angled_cframe({0, 0, self.angle}) * vector.angled_cframe({0, -item.bank_left.angle, 0})
-				cf = cf * CFrame.new(length / 2, - self.thickness / 2, - width / 2)
+				local cf = CFrame.new(unpack(pback))
+					* vector.angled_cframe({0, 0, self.angle})
+					* vector.angled_cframe({0, -item.bank_left.angle, 0})
+					* CFrame.new(length / 2, - self.thickness / 2, - width / 2)
 
 				-- draw.axis(vector.table_to_vector3(pback), vector.table_to_vector3(pfront))
 				blueprint:add_part('step_bank', {length, self.thickness, width},
@@ -219,19 +221,35 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 					{
 						surface = Enum.SurfaceType.SmoothNoOutlines,
 					})
+
+				if item.bank_left.runoff_angle ~= nil then
+					local cf = CFrame.new(unpack(pback))
+						* vector.angled_cframe({0, 0, self.angle})
+						* vector.angled_cframe({0, -item.bank_left.angle, 0})
+						* vector.angled_cframe({-item.bank_left.runoff_angle, 0, 0})
+						* CFrame.new(length / 2, - self.thickness / 2, - width / 2)
+					blueprint:add_part('bank_runoff', {length, self.thickness, width},
+						vector.vector3_to_table(cf.p),
+						vector.angles_from_cframe(cf),
+						{
+							surface = Enum.SurfaceType.SmoothNoOutlines,
+						})
+				end
 			end
 			if item.bank_right ~= nil then
 				local l = item.lengthx * self.length
 				local width = geometry.d2.offset_dist(item.bank_right.angle, l)[2]
 				local length = geometry.d2.dist_from_x(item.bank_right.angle, l)
 
-				local offset_front = geometry.d2.offset_dist(item.bank_right.angle, length)[2]
+				-- local offset_front = geometry.d2.offset_dist(item.bank_right.angle, length)[2]
 
 				local pback = { pstart[1], pstart[2], self.width * (item.positiony + item.lengthy) }
-				local pfront = { pend[1], pend[2], self.width * (item.positiony + item.lengthy) - offset_front }
+				-- local pfront = { pend[1], pend[2], self.width * (item.positiony + item.lengthy) - offset_front }
 
-				local cf = CFrame.new(unpack(pback)) * vector.angled_cframe({0, 0, self.angle}) * vector.angled_cframe({0, item.bank_left.angle, 0})
-				cf = cf * CFrame.new(length / 2, - self.thickness / 2, width / 2)
+				local cf = CFrame.new(unpack(pback))
+					* vector.angled_cframe({0, 0, self.angle})
+					* vector.angled_cframe({0, item.bank_left.angle, 0})
+					* CFrame.new(length / 2, - self.thickness / 2, width / 2)
 
 				-- draw.axis(vector.table_to_vector3(pback), vector.table_to_vector3(pfront))
 				blueprint:add_part('step_bank', {length, self.thickness, width},
@@ -240,6 +258,19 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 					{
 						surface = Enum.SurfaceType.SmoothNoOutlines,
 					})
+				if item.bank_left.runoff_angle ~= nil then
+					local cf = CFrame.new(unpack(pback))
+						* vector.angled_cframe({0, 0, self.angle})
+						* vector.angled_cframe({0, item.bank_left.angle, 0})
+						* vector.angled_cframe({item.bank_left.runoff_angle, 0, 0})
+						* CFrame.new(length / 2, - self.thickness / 2, width / 2)
+					blueprint:add_part('bank_runoff', {length, self.thickness, width},
+						vector.vector3_to_table(cf.p),
+						vector.angles_from_cframe(cf),
+						{
+							surface = Enum.SurfaceType.SmoothNoOutlines,
+						})
+				end
 			end
 		end,
 	}, class_by_name 'hydros.CompiledBlueprint' .compile_functions),
@@ -262,13 +293,14 @@ function slime_mountain_generator (width, length, angle)
 			end
 			if step_width_1 ~= step_width_2 then
 				local bank_angle = math.random(5, 45)
+				local runoff_angle = math.random(5, 45)
 				blueprint:add_mountain_step(
 					offset / length, step_length / length, step_width_1 / width, (step_width_2 - step_width_1) / width,
 					{
 						depthx = math.random(75, 120) * 0.01,
 						depthy = math.random(75, 120) * 0.01,
-						bank_left = { angle = bank_angle },
-						bank_right = { angle = bank_angle },
+						bank_left = { angle = bank_angle, runoff_angle = runoff_angle },
+						bank_right = { angle = bank_angle, runoff_angle = runoff_angle },
 					})
 			end
 		end
