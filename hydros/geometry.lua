@@ -196,7 +196,13 @@ local function find_segment_collision (s1, s2)
 end
 
 
+local function dist_from_x(angle, x)
+	return x / math.cos(math.rad(angle))
+end
 
+local function dist_from_y(angle, y)
+	return y / math.sin(math.rad(angle))
+end
 
 local function offset_dist(angle, dist)
 	return {dist * math.cos(math.rad(angle)), dist * math.sin(math.rad(angle))}
@@ -235,6 +241,8 @@ return export {
 			join_overlapping_segments = join_overlapping_segments,
 			find_line_collision = find_line_collision,
 			find_segment_collision = find_segment_collision,
+			dist_from_x = dist_from_x,
+			dist_from_y = dist_from_y,
 			offset_dist = offset_dist,
 			offset_point = offset_point,
 			offset_segment = offset_segment,
