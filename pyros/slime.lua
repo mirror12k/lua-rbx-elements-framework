@@ -148,7 +148,8 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 		})
 	end,
 	add_mountain_step = function (self, positionx, lengthx, positiony, lengthy, opts)
-		self:add_hole(positionx, lengthx, positiony, lengthy)
+		-- a hole is unneeded here because negative ground is not taken
+		-- self:add_hole(positionx, lengthx, positiony, lengthy)
 		return self:add('mountain_step', {
 			positionx = positionx,
 			lengthx = lengthx,
@@ -368,11 +369,11 @@ function slime_mountain_generator (width, length, angle)
 							bank_right = { angle = bank_angle, runoff_angle = runoff_angle },
 						})
 				else
-					local bank_angle = math.random(5, 45)
+					local bank_angle = math.random(20, 60)
 					blueprint:add_mountain_step(
 						offset / length, step_length / length, step_width_1 / width, (step_width_2 - step_width_1) / width,
 						{
-							angle = math.random(-25, 0),
+							angle = math.random(-15, 0),
 							bank_left = bank_angle,
 							bank_right = bank_angle,
 						})
@@ -387,24 +388,32 @@ end
 
 
 
-function generate_slime_wave(width, size, cf, parent, tick_fun)
-	local tick = tick_fun()
-	for i = 0, width, size do
-		if math.noise(tick, 15678.215, i / 0.1) > 0 then
-			new 'pyros.SlimeBlueprint' (size, 3 * (4/3) * math.pi * size^3 ) -- formula of a sphere
-				:build({ cframe = cf * CFrame.new(0, math.random() * size, i + (math.random() - 0.5) * size ) }).Parent = parent
-		end
-	end
-end
-
 
 function start_mountain_slime_waves(width, size, parent, offset)
+	local cf = CFrame.new(offset[1] - size * 2, offset[2] + size * 2, offset[3])
 	local tick = 0.1
-	interval(generate_slime_wave, 1, 1000, width, size, CFrame.new(offset[1] - size * 2, offset[2] + size * 2, offset[3]), parent,
-		function ()
+
+	cw(function ()
+		local v = block.value('spawn_slimes', 'Bool', true)
+		v.Parent = game.ServerStorage
+		while v.Parent ~= nil do
+			while v.Value ~= true do
+				wait(1)
+			end
 			tick = tick + 0.1
-			return tick
-		end)
+			local count = 0
+			local spawned = 0
+			for i = 0, width, size do
+				count = count + 1
+				if math.noise(tick, 15678.215, i * 0.125) > 0 then
+					spawned = spawned + 1
+					new 'pyros.SlimeBlueprint' (size, 3 * (4/3) * math.pi * size^3 ) -- formula of a sphere
+						:build({ cframe = cf * CFrame.new(0, math.random() * size, i + (math.random() - 0.5) * size ) }).Parent = parent
+				end
+			end
+			wait(3 * spawned / count)
+		end
+	end)
 end
 
 
