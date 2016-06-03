@@ -125,6 +125,39 @@ local function hinge(part0, part1, name, hinge_type)
 end
 
 
+
+local function spawn(name, size, position, rotation)
+	local part = Instance.new('SpawnLocation')
+	part.Anchored = true
+--	part.FormFactor = 'Custom'
+	part.TopSurface = 'Smooth'
+	part.BottomSurface = 'Smooth'
+	part.Material = 'SmoothPlastic'
+	part.Name = name or 'SpawnLocation'
+	
+	local cf
+	if position ~= nil then
+		if rotation == nil then
+			cf = CFrame.new(position[1], position[2], position[3])
+		else
+			cf = CFrame.new(position[1], position[2], position[3]) * vector.angled_cframe(rotation)
+		end
+	else
+		cf = CFrame.new()
+	end
+	part.CFrame = cf
+	
+	if size == nil then
+		part.Size = Vector3.new(1,1,1)
+	else
+		part.Size = Vector3.new(size[1],size[2],size[3])
+	end
+
+	return part
+end
+
+
+
 local get_mass_of_model
 get_mass_of_model = function (m)
 	local mass = 0
@@ -144,6 +177,7 @@ return export {
 	block = {
 		block_from_cframe = block_from_cframe,
 		block = block,
+		spawn = spawn,
 		model = model,
 		group = group,
 		value = value,

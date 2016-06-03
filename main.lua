@@ -216,3 +216,5 @@ local mountain = slime_mountain_generator(100, 500, 30)
 mountain:build().Parent = workspace
 
 start_mountain_slime_waves(100, 10, workspace, mountain:get_top_edge())
+
+block.spawn('spawn', {10, 1, 10}, {0, 30, 50}).Parent = workspace
