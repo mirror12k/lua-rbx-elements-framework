@@ -212,9 +212,22 @@ import 'pyros/pyros'
 -- 					})
 -- 	:build().Parent = workspace
 
-local mountain = slime_mountain_generator(100, 500, 30)
+local mountain, top = multi_slope_slime_mountain_generator(170, 3, {})
 mountain:build().Parent = workspace
 
-start_mountain_slime_waves(100, 10, workspace, mountain:get_top_edge())
+-- local mountain = slime_mountain_generator(100, 500, 30)
+-- mountain:build().Parent = workspace
+-- local top = CFrame.new(vector.table_to_vector3(mountain:get_top_edge()))
+
+-- mountain = slime_mountain_generator(100, 500, 35)
+-- mountain:build({ cframe = top }).Parent = workspace
+-- top = top * CFrame.new(vector.table_to_vector3(mountain:get_top_edge()))
+
+-- mountain = slime_mountain_generator(100, 500, 45)
+-- mountain:build({ cframe = top }).Parent = workspace
+-- top = top * CFrame.new(vector.table_to_vector3(mountain:get_top_edge()))
 
 block.spawn('spawn', {10, 1, 10}, {0, 30, 50}).Parent = workspace
+
+start_mountain_slime_waves(100, 10, workspace, CFrame.new(vector.table_to_vector3(top)))
+

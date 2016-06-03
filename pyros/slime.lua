@@ -123,7 +123,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 	end,
 
 	get_top_edge = function (self)
-		return {self.pdelta[1] + self.offset[1], self.pdelta[2] + self.offset[2], 0}
+		return {self.pdelta[1], self.pdelta[2], 0}
 	end,
 	add_hole = function (self, positionx, lengthx, positiony, lengthy)
 		self.holes[#self.holes + 1] = {
@@ -387,10 +387,28 @@ function slime_mountain_generator (width, length, angle)
 end
 
 
+function multi_slope_slime_mountain_generator(width, count, opts)
+	local bp = new 'hydros.ModelBlueprint' ()
+	local position = {0, 0, 0}
+
+	for i = 1, count do
+		local length = math.random(opts.min_length or 200, opts.max_length or 400)
+		local angle = math.random(opts.min_angle or 30, opts.max_angle or 40)
+
+		local mountain = slime_mountain_generator(width, length, angle)
+		bp:add_model(nil, mountain, { position = position })
+
+		local new_position = mountain:get_top_edge()
+		position = { new_position[1] + position[1], new_position[2] + position[2], new_position[3] + position[3] }
+	end
+
+	return bp, position
+end
+
 
 
 function start_mountain_slime_waves(width, size, parent, offset)
-	local cf = CFrame.new(offset[1] - size * 2, offset[2] + size * 2, offset[3])
+	local cf = offset * CFrame.new(-size * 2, size * 2, 0)
 	local tick = 0.1
 
 	cw(function ()
@@ -419,5 +437,6 @@ end
 
 return export {
 	slime_mountain_generator = slime_mountain_generator,
+	multi_slope_slime_mountain_generator = multi_slope_slime_mountain_generator,
 	start_mountain_slime_waves = start_mountain_slime_waves,
 }
