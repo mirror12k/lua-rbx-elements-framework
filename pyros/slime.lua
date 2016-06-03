@@ -134,6 +134,19 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 		}
 		return self
 	end,
+	add_mountain_crack = function (self, positionx, lengthx, positiony, lengthy, opts)
+		self:add_hole(positionx, lengthx, positiony, lengthy)
+		return self:add('mountain_crack', {
+			positionx = positionx,
+			lengthx = lengthx,
+			positiony = positiony,
+			lengthy = lengthy,
+			depthx = opts.depthx or 1,
+			depthy = opts.depthy or 1,
+			bank_left = opts.bank_left,
+			bank_right = opts.bank_right,
+		})
+	end,
 	add_mountain_step = function (self, positionx, lengthx, positiony, lengthy, opts)
 		self:add_hole(positionx, lengthx, positiony, lengthy)
 		return self:add('mountain_step', {
@@ -141,8 +154,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 			lengthx = lengthx,
 			positiony = positiony,
 			lengthy = lengthy,
-			depthx = opts.depthx or 1,
-			depthy = opts.depthy or 1,
+			angle = opts.angle or 0,
 			bank_left = opts.bank_left,
 			bank_right = opts.bank_right,
 		})
@@ -167,7 +179,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 	end,
 
 	compile_functions = table_append({
-		mountain_step = function (self, blueprint, item, options)
+		mountain_crack = function (self, blueprint, item, options)
 			local size = geometry.d2.offset_dist(self.angle, item.lengthx * self.length)
 			size[1] = size[1] * item.depthx
 			size[2] = size[2] * item.depthy
@@ -179,7 +191,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 
 			local s1 = geometry.d2.offset_segment({pstart, pmid}, -90, self.thickness / 2)
 			local s2 = geometry.d2.offset_segment({pmid, pend}, -90, self.thickness / 2)
-			blueprint:add_part('step', {geometry.d2.distance_of_points(unpack(s1)), self.thickness, item.lengthy * self.width},
+			blueprint:add_part('crack_base', {geometry.d2.distance_of_points(unpack(s1)), self.thickness, item.lengthy * self.width},
 				{
 					(s1[1][1] + s1[2][1]) / 2,
 					(s1[1][2] + s1[2][2]) / 2,
@@ -189,7 +201,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				{
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
-			blueprint:add_part('step_wall', {geometry.d2.distance_of_points(unpack(s2)), self.thickness, item.lengthy * self.width},
+			blueprint:add_part('crack_wall', {geometry.d2.distance_of_points(unpack(s2)), self.thickness, item.lengthy * self.width},
 				{
 					(s2[1][1] + s2[2][1]) / 2,
 					(s2[1][2] + s2[2][2]) / 2,
@@ -215,7 +227,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 					* CFrame.new(length / 2, - self.thickness / 2, - width / 2)
 
 				-- draw.axis(vector.table_to_vector3(pback), vector.table_to_vector3(pfront))
-				blueprint:add_part('step_bank', {length, self.thickness, width},
+				blueprint:add_part('crack_bank', {length, self.thickness, width},
 					vector.vector3_to_table(cf.p),
 					vector.angles_from_cframe(cf),
 					{
@@ -252,7 +264,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 					* CFrame.new(length / 2, - self.thickness / 2, width / 2)
 
 				-- draw.axis(vector.table_to_vector3(pback), vector.table_to_vector3(pfront))
-				blueprint:add_part('step_bank', {length, self.thickness, width},
+				blueprint:add_part('crack_bank', {length, self.thickness, width},
 					vector.vector3_to_table(cf.p),
 					vector.angles_from_cframe(cf),
 					{
@@ -273,6 +285,28 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				end
 			end
 		end,
+		mountain_step = function (self, blueprint, item, options)
+			local size = geometry.d2.offset_dist(self.angle + item.angle, item.lengthx * self.length)
+
+			local pstart = { self.pdelta[1] * item.positionx, self.pdelta[2] * item.positionx }
+			local pend = { self.pdelta[1] * (item.positionx + item.lengthx), self.pdelta[2] * (item.positionx + item.lengthx) }
+			local pmid = { pend[1] - size[1], pstart[2] + size[2] }
+
+
+			local seg = geometry.d2.offset_segment({pend, pmid}, 90, self.thickness / 2)
+
+			blueprint:add_part('step', {geometry.d2.distance_of_points(unpack(seg)), self.thickness, item.lengthy * self.width},
+				{
+					(seg[1][1] + seg[2][1]) / 2,
+					(seg[1][2] + seg[2][2]) / 2,
+					self.width * (item.positiony + item.lengthy / 2),
+				},
+				{0, 0, geometry.d2.angle_of_points(unpack(seg))},
+				{
+					surface = Enum.SurfaceType.SmoothNoOutlines,
+				})
+
+		end,
 	}, class_by_name 'hydros.CompiledBlueprint' .compile_functions),
 }
 
@@ -292,16 +326,27 @@ function slime_mountain_generator (width, length, angle)
 				step_width_2 = store
 			end
 			if step_width_1 ~= step_width_2 then
-				local bank_angle = math.random(5, 45)
-				local runoff_angle = math.random(5, 45)
-				blueprint:add_mountain_step(
-					offset / length, step_length / length, step_width_1 / width, (step_width_2 - step_width_1) / width,
-					{
-						depthx = math.random(75, 120) * 0.01,
-						depthy = math.random(75, 120) * 0.01,
-						bank_left = { angle = bank_angle, runoff_angle = runoff_angle },
-						bank_right = { angle = bank_angle, runoff_angle = runoff_angle },
-					})
+				if math.random() > 0.5 then
+					local bank_angle = math.random(5, 45)
+					local runoff_angle = math.random(5, 45)
+					blueprint:add_mountain_crack(
+						offset / length, step_length / length, step_width_1 / width, (step_width_2 - step_width_1) / width,
+						{
+							depthx = math.random(75, 120) * 0.01,
+							depthy = math.random(75, 120) * 0.01,
+							bank_left = { angle = bank_angle, runoff_angle = runoff_angle },
+							bank_right = { angle = bank_angle, runoff_angle = runoff_angle },
+						})
+				else
+					local bank_angle = math.random(5, 45)
+					blueprint:add_mountain_step(
+						offset / length, step_length / length, step_width_1 / width, (step_width_2 - step_width_1) / width,
+						{
+							angle = math.random(-25, 0),
+							bank_left = bank_angle,
+							bank_right = bank_angle,
+						})
+				end
 			end
 		end
 		offset = offset + step_length + math.random(5, 25)

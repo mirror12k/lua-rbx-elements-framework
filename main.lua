@@ -198,13 +198,13 @@ import 'pyros/pyros'
 
 -- new 'pyros.SlimeBlueprint' (20, {80, 200, 80}):build({cframe = CFrame.new(0, 50, 0)}).Parent = workspace
 -- new 'pyros.slime.SlimeMountainBlueprint' (100, 100, 45)
--- 	:add_mountain_step(0.2, 0.4, 0, 0.5, {
+-- 	:add_mountain_crack(0.2, 0.4, 0, 0.5, {
 -- 						depthx = 0.75,
 -- 						depthy = 0.75,
 -- 						bank_left = { angle = 15, runoff_angle = 20 },
 -- 						bank_right = { angle = 15, runoff_angle = 20 },
 -- 					})
--- 	:add_mountain_step(0.7, 0.3, 0.8, 0.2, {
+-- 	:add_mountain_crack(0.7, 0.3, 0.8, 0.2, {
 -- 						depthx = 1.5,
 -- 						depthy = 1.5,
 -- 						bank_left = { angle = 15, runoff_angle = 20 },
