@@ -306,6 +306,36 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
 
+			local cf = CFrame.new((pend[1] + pmid[1]) / 2, (pend[2] + pmid[2]) / 2, self.width * item.positiony)
+				* vector.angled_cframe({0, 0, geometry.d2.angle_of_points(unpack(seg))})
+				* vector.angled_cframe({-item.bank_left, 0, 0})
+				* CFrame.new(0, self.thickness / 2, item.lengthy * self.width / 2)
+
+			blueprint:add_part('step_bank', {geometry.d2.distance_of_points(unpack(seg)), self.thickness, item.lengthy * self.width},
+				vector.vector3_to_table(cf.p),
+				vector.angles_from_cframe(cf),
+				{
+					surface = Enum.SurfaceType.SmoothNoOutlines,
+				})
+
+			local cf = CFrame.new((pend[1] + pmid[1]) / 2, (pend[2] + pmid[2]) / 2, self.width * (item.positiony + item.lengthy))
+				* vector.angled_cframe({0, 0, geometry.d2.angle_of_points(unpack(seg))})
+				* vector.angled_cframe({item.bank_right, 0, 0})
+				* CFrame.new(0, self.thickness / 2, -item.lengthy * self.width / 2)
+
+			blueprint:add_part('step_bank', {geometry.d2.distance_of_points(unpack(seg)), self.thickness, item.lengthy * self.width},
+				vector.vector3_to_table(cf.p),
+				vector.angles_from_cframe(cf),
+				{
+					surface = Enum.SurfaceType.SmoothNoOutlines,
+				})
+
+
+			-- CFrame.new((pend[1] + pmid[1]) / 2, (pend[2] + pmid[2]) / 2, self.width * (item.positiony + item.lengthy))
+			-- 	* vector.angled_cframe({0, 0, geometry.d2.angle_of_points(unpack(seg))})
+			-- 	* vector.angled_cframe({item.bank_right, 0, 0})
+
+
 		end,
 	}, class_by_name 'hydros.CompiledBlueprint' .compile_functions),
 }
