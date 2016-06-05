@@ -135,6 +135,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 		return self
 	end,
 	add_mountain_crack = function (self, positionx, lengthx, positiony, lengthy, opts)
+		opts = opts or {}
 		self:add_hole(positionx, lengthx, positiony, lengthy)
 		return self:add('mountain_crack', {
 			positionx = positionx,
@@ -148,6 +149,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 		})
 	end,
 	add_mountain_step = function (self, positionx, lengthx, positiony, lengthy, opts)
+		opts = opts or {}
 		-- a hole is unneeded here because negative ground is not taken
 		-- self:add_hole(positionx, lengthx, positiony, lengthy)
 		return self:add('mountain_step', {
@@ -161,6 +163,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 		})
 	end,
 	add_zigzag = function (self, direction, positionx, lengthx, positiony, lengthy, opts)
+		opts = opts or {}
 		self:add_hole(positionx, lengthx, positiony, lengthy)
 		return self:add('zigzag', {
 			direction = direction,
@@ -414,6 +417,23 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 }
 
 
+function slime_zigzag_mountain_generator (width, length, angle)
+	local blueprint = new 'pyros.slime.SlimeMountainBlueprint' (width, length, angle)
+
+	local offset = 0
+	local is_left = true
+	while offset < length do
+		local step_length = math.random(20, 50)
+		if offset + step_length < length then
+			local direction = is_left and 'left' or 'right'
+			is_left = not is_left
+			blueprint:add_zigzag(direction, offset / length, step_length / length, 0, 1, {})
+		end
+		offset = offset + step_length + math.random(5, 30) * 0.1
+	end
+
+	return blueprint
+end
 
 function slime_mountain_generator (width, length, angle)
 	local blueprint = new 'pyros.slime.SlimeMountainBlueprint' (width, length, angle)
@@ -463,11 +483,19 @@ function multi_slope_slime_mountain_generator(width, count, opts)
 	local bp = new 'hydros.ModelBlueprint' ()
 	local position = {0, 0, 0}
 
+	local zigzag_generated = false
+
 	for i = 1, count do
 		local length = math.random(opts.min_length or 200, opts.max_length or 400)
 		local angle = math.random(opts.min_angle or 30, opts.max_angle or 40)
 
-		local mountain = slime_mountain_generator(width, length, angle)
+		local mountain
+		if math.random() > 0.4 and zigzag_generated == false then
+			zigzag_generated = true
+			mountain = slime_zigzag_mountain_generator(width, length, angle)
+		else
+			mountain = slime_mountain_generator(width, length, angle)
+		end
 		bp:add_model(nil, mountain, { position = position })
 
 		local new_position = mountain:get_top_edge()
