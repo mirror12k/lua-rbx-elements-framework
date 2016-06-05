@@ -213,7 +213,7 @@ import 'pyros/pyros'
 -- 	:build().Parent = workspace
 
 new 'pyros.slime.SlimeMountainBlueprint' (100, 100, 45)
-	:add_zigzag('left', 0.2, 0.4, 0, 0.5, {})
+	:add_zigzag('right', 0.2, 0.4, 0, 0.5, {})
 	:add_zigzag('left', 0.7, 0.3, 0.8, 0.2, {})
 	:build().Parent = workspace
 

@@ -359,20 +359,27 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 			local slope_horizontal_width = self.width * item.lengthy - (step_width * 2)
 			local slope_width = geometry.d2.distance_of_point({slope_horizontal_width, size[2]})
 
-			-- x will be avg of pstart, pend
-			-- y will be offset by angle (actually will come out to be pstart.y)
-			-- z will be middle of left and right edge
+			local step_offset = size[2] / 2
+			if item.direction == 'right' then
+				step_offset = -step_offset
+			end
 
-
-			blueprint:add_part('zigzag_step', {size[1], size[2], step_width},
-				{ (pstart[1] + pend[1]) / 2, pstart[2] + size[2] / 2, self.width * item.positiony + step_width / 2 },
+			blueprint:add_part('zigzag_wall', { 5, size[2], self.width * item.lengthy},
+				{ pend[1] + 5 / 2, (pstart[2] + pend[2]) / 2, self.width * (item.positiony + item.lengthy / 2) },
 				nil,
 				{
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
 
 			blueprint:add_part('zigzag_step', {size[1], size[2], step_width},
-				{ (pstart[1] + pend[1]) / 2, pstart[2] - size[2] / 2, self.width * (item.positiony + item.lengthy) - step_width / 2 },
+				{ (pstart[1] + pend[1]) / 2, pstart[2] + step_offset, self.width * item.positiony + step_width / 2 },
+				nil,
+				{
+					surface = Enum.SurfaceType.SmoothNoOutlines,
+				})
+
+			blueprint:add_part('zigzag_step', {size[1], size[2], step_width},
+				{ (pstart[1] + pend[1]) / 2, pstart[2] - step_offset, self.width * (item.positiony + item.lengthy) - step_width / 2 },
 				nil,
 				{
 					surface = Enum.SurfaceType.SmoothNoOutlines,
@@ -381,13 +388,22 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 			-- {y,z} format points
 			local ptop = { pend[2], self.width * item.positiony + step_width }
 			local pbot = { pstart[2], self.width * (item.positiony + item.lengthy) - step_width }
+			if item.direction == 'right' then
+				local store = ptop[1]
+				ptop[1] = pbot[1]
+				pbot[1] = store
+			end
 
 			local seg = geometry.d2.offset_segment({ptop, pbot}, 90, size[2] / 2)
 
+			local slope_angle = geometry.d2.angle_of_point({slope_horizontal_width, size[2]})
+			if item.direction == 'right' then
+				slope_angle = -slope_angle
+			end
 
 			blueprint:add_part('zigzag_slope', {size[1], size[2], slope_width},
 				{ (pstart[1] + pend[1]) / 2, (seg[1][1] + seg[2][1]) / 2, (seg[1][2] + seg[2][2]) / 2 },
-				{geometry.d2.angle_of_point({slope_horizontal_width, size[2]}), 0, 0},
+				{slope_angle, 0, 0},
 				{
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
