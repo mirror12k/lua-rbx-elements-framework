@@ -95,7 +95,7 @@ SlimeBlueprint = class 'pyros.SlimeBlueprint' {
 		local ai = SlimeAI.new(self.size, m)
 		if self.dampening ~= nil then
 			local f = Instance.new('BodyVelocity')
-			f.Velocity = Vector3.new(-10,0,0)
+			f.Velocity = Vector3.new(-30,0,0)
 			f.MaxForce = Vector3.new(self.dampening, self.dampening, self.dampening)
 			f.Parent = m.core
 		end
@@ -423,7 +423,7 @@ function slime_zigzag_mountain_generator (width, length, angle)
 	local offset = 0
 	local is_left = true
 	while offset < length do
-		local step_length = math.random(20, 50)
+		local step_length = math.random(20, 70)
 		if offset + step_length < length then
 			local direction = is_left and 'left' or 'right'
 			is_left = not is_left
@@ -492,7 +492,7 @@ function multi_slope_slime_mountain_generator(width, count, opts)
 		local mountain
 		if math.random() > 0.4 and zigzag_generated == false then
 			zigzag_generated = true
-			mountain = slime_zigzag_mountain_generator(width, length, angle)
+			mountain = slime_zigzag_mountain_generator(width, length / 2, angle)
 		else
 			mountain = slime_mountain_generator(width, length, angle)
 		end
