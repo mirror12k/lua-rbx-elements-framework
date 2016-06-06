@@ -242,4 +242,22 @@ block.spawn('spawn', {10, 1, 10}, {0, 30, 50}).Parent = workspace
 
 start_mountain_slime_waves(150, 10, workspace, CFrame.new(vector.table_to_vector3(top)))
 
+players.on_player(function (player)
+	print("player joined:" .. player.UserId)
+end)
 
+players.on_player_left(function (player)
+	print("player left:" .. player.UserId)
+end)
+
+players.on_character(function (player, character)
+	print("character spawned:" .. player.UserId)
+end)
+
+players.on_character_died(function (player, character)
+	print("character died:" .. player.UserId)
+end)
+
+players.on_character_removed(function (player, character)
+	print("character removed:" .. player.UserId)
+end)
