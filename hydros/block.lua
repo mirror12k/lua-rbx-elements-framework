@@ -82,6 +82,13 @@ local function ungroup(m)
 	)
 end
 
+
+local function folder(name)
+	local m = Instance.new('Folder')
+	m.Name = name or 'Folder'
+	return m
+end
+
 local function value(name, type, val)
 	local v = Instance.new(type .. 'Value')
 	v.Value = val
@@ -180,6 +187,7 @@ return export {
 		spawn = spawn,
 		model = model,
 		group = group,
+		folder = folder,
 		value = value,
 
 		joint = joint,

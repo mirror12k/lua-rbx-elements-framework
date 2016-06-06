@@ -25,6 +25,7 @@ table_append(exports, import('blueprint', 'import_list'))
 table_append(exports, import('draw', 'import_list'))
 table_append(exports, import('geometry', 'import_list'))
 table_append(exports, import('spaceful', 'import_list'))
+table_append(exports, import('registry', 'import_list'))
 
 
 

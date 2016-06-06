@@ -233,12 +233,15 @@ import 'pyros/pyros'
 
 
 
-math.randomseed(tick())
+-- math.randomseed(tick())
 
-local mountain, top = multi_slope_slime_mountain_generator(150, 3, {})
-mountain:build().Parent = workspace
+-- local mountain, top = multi_slope_slime_mountain_generator(150, 3, {})
+-- mountain:build().Parent = workspace
 
-block.spawn('spawn', {10, 1, 10}, {0, 30, 50}).Parent = workspace
+-- block.spawn('spawn', {10, 1, 10}, {0, 30, 50}).Parent = workspace
 
-start_mountain_slime_waves(150, 10, workspace, CFrame.new(vector.table_to_vector3(top)))
+-- start_mountain_slime_waves(150, 10, workspace, CFrame.new(vector.table_to_vector3(top)))
 
+
+registry.create('asdf.testbool', 'Bool', true)
+registry.on_change('asdf.testbool', function (val) print('i saw that: ', val) end)
