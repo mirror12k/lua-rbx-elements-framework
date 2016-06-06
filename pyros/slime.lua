@@ -187,6 +187,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				},
 				{0, 0, self.angle},
 				{
+					color = {0.2, 0.8, 0.2},
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
 		end
@@ -214,6 +215,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				},
 				{0, 0, geometry.d2.angle_of_points(unpack(s1))},
 				{
+					color = {0.25, 0.25, 0.25},
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
 			blueprint:add_part('crack_wall', {geometry.d2.distance_of_points(unpack(s2)), self.thickness, item.lengthy * self.width},
@@ -224,6 +226,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				},
 				{0, 0, geometry.d2.angle_of_points(unpack(s2))},
 				{
+					color = {0.25, 0.25, 0.25},
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
 			if item.bank_left ~= nil then
@@ -246,6 +249,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 					vector.vector3_to_table(cf.p),
 					vector.angles_from_cframe(cf),
 					{
+						color = {0.2, 0.8, 0.2},
 						surface = Enum.SurfaceType.SmoothNoOutlines,
 					})
 
@@ -259,6 +263,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 						vector.vector3_to_table(cf.p),
 						vector.angles_from_cframe(cf),
 						{
+							color = {0.25, 0.25, 0.25},
 							surface = Enum.SurfaceType.SmoothNoOutlines,
 						})
 				end
@@ -283,6 +288,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 					vector.vector3_to_table(cf.p),
 					vector.angles_from_cframe(cf),
 					{
+						color = {0.2, 0.8, 0.2},
 						surface = Enum.SurfaceType.SmoothNoOutlines,
 					})
 				if item.bank_left.runoff_angle ~= nil then
@@ -295,6 +301,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 						vector.vector3_to_table(cf.p),
 						vector.angles_from_cframe(cf),
 						{
+							color = {0.25, 0.25, 0.25},
 							surface = Enum.SurfaceType.SmoothNoOutlines,
 						})
 				end
@@ -318,6 +325,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				},
 				{0, 0, geometry.d2.angle_of_points(unpack(seg))},
 				{
+					color = {0.38, 0.38, 0.38},
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
 
@@ -330,6 +338,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				vector.vector3_to_table(cf.p),
 				vector.angles_from_cframe(cf),
 				{
+					color = {0.38, 0.38, 0.38},
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
 
@@ -342,14 +351,9 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 				vector.vector3_to_table(cf.p),
 				vector.angles_from_cframe(cf),
 				{
+					color = {0.38, 0.38, 0.38},
 					surface = Enum.SurfaceType.SmoothNoOutlines,
 				})
-
-
-			-- CFrame.new((pend[1] + pmid[1]) / 2, (pend[2] + pmid[2]) / 2, self.width * (item.positiony + item.lengthy))
-			-- 	* vector.angled_cframe({0, 0, geometry.d2.angle_of_points(unpack(seg))})
-			-- 	* vector.angled_cframe({item.bank_right, 0, 0})
-
 
 		end,
 		zigzag = function (self, blueprint, item, options)
