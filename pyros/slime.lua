@@ -578,8 +578,8 @@ end
 
 
 
-function start_mountain_slime_waves(width, size, parent, offset)
-	local cf = offset * CFrame.new(-size * 2, size * 2, 0)
+function start_mountain_slime_waves(width, orginal_size, parent, offset)
+	local cf = offset
 	local tick = 0.1
 
 	cw(function ()
@@ -589,7 +589,10 @@ function start_mountain_slime_waves(width, size, parent, offset)
 			while v.Value ~= true do
 				wait(1)
 			end
+
 			tick = tick + 0.1
+			local size = orginal_size + (((math.noise(tick * 4, 54653.215, 15.36375) + 0.5) * 2) ^ 2) * 5
+
 			local count = 0
 			local spawned = 0
 			for i = 0, width, size do
@@ -597,7 +600,8 @@ function start_mountain_slime_waves(width, size, parent, offset)
 				if math.noise(tick, 15678.215, i * 0.125) > 0 then
 					spawned = spawned + 1
 					new 'pyros.SlimeBlueprint' (size, 3 * (4/3) * math.pi * size^3 ) -- formula of a sphere
-						:build({ cframe = cf * CFrame.new(0, math.random() * size, i + (math.random() - 0.5) * size ) }).Parent = parent
+						:build({ cframe = cf * CFrame.new(-size * 2, size * 2, 0)
+							* CFrame.new(0, math.random() * size, i + (math.random() - 0.5) * size ) }).Parent = parent
 				end
 			end
 			wait(3 * spawned / count)

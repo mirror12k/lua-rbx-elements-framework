@@ -233,6 +233,7 @@ import 'pyros/pyros'
 
 
 
+math.randomseed(tick())
 
 local mountain, top = multi_slope_slime_mountain_generator(150, 3, {})
 mountain:build().Parent = workspace
