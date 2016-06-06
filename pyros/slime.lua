@@ -444,15 +444,82 @@ function slime_mountain_generator (width, length, angle)
 
 	local offset = 20
 	while offset < length do
-		local step_length = math.random(10, 20)
+		local step_length = math.random(10, 30)
 		if offset + step_length < length then
 			local step_width_1, step_width_2 = math.random(0, width), math.random(0, width)
+			-- ensure that
 			if step_width_1 > step_width_2 then
 				local store = step_width_1
 				step_width_1 = step_width_2
 				step_width_2 = store
 			end
-			if step_width_1 ~= step_width_2 then
+			-- ensure the width is sufficient
+			while (step_width_2 - step_width_1) / width < 0.2 do
+				step_width_1, step_width_2 = math.random(0, width), math.random(0, width)
+				if step_width_1 > step_width_2 then
+					local store = step_width_1
+					step_width_1 = step_width_2
+					step_width_2 = store
+				end
+			end
+			if (step_width_2 - step_width_1) / width >= 0.7 then
+				local step_width_3, step_width_4 = math.random(step_width_1 + width * 0.1, step_width_2 - width * 0.1),
+						math.random(step_width_1 + width * 0.1, step_width_2 - width * 0.1)
+				if step_width_3 > step_width_4 then
+					local store = step_width_3
+					step_width_3 = step_width_4
+					step_width_4 = store
+				end
+				while (step_width_4 - step_width_3) / width < 0.2 do
+					step_width_3, step_width_4 = math.random(step_width_1 + width * 0.1, step_width_2 - width * 0.1),
+						math.random(step_width_1 + width * 0.1, step_width_2 - width * 0.1)
+					if step_width_3 > step_width_4 then
+						local store = step_width_3
+						step_width_3 = step_width_4
+						step_width_4 = store
+					end
+				end
+
+				if math.random() > 0.5 then
+					local bank_angle = math.random(5, 45)
+					local runoff_angle = math.random(5, 45)
+					blueprint:add_mountain_crack(
+						offset / length, step_length / length, step_width_1 / width, (step_width_3 - step_width_1) / width,
+						{
+							depthx = math.random(75, 120) * 0.01,
+							depthy = math.random(75, 120) * 0.01,
+							bank_left = { angle = bank_angle, runoff_angle = runoff_angle },
+							bank_right = { angle = bank_angle, runoff_angle = runoff_angle },
+						})
+					bank_angle = math.random(5, 45)
+					runoff_angle = math.random(5, 45)
+					blueprint:add_mountain_crack(
+						offset / length, step_length / length, step_width_4 / width, (step_width_2 - step_width_4) / width,
+						{
+							depthx = math.random(75, 120) * 0.01,
+							depthy = math.random(75, 120) * 0.01,
+							bank_left = { angle = bank_angle, runoff_angle = runoff_angle },
+							bank_right = { angle = bank_angle, runoff_angle = runoff_angle },
+						})
+				else
+					local bank_angle = math.random(20, 60)
+					blueprint:add_mountain_step(
+						offset / length, step_length / length, step_width_1 / width, (step_width_3 - step_width_1) / width,
+						{
+							angle = math.random(-15, 0),
+							bank_left = bank_angle,
+							bank_right = bank_angle,
+						})
+					bank_angle = math.random(20, 60)
+					blueprint:add_mountain_step(
+						offset / length, step_length / length, step_width_4 / width, (step_width_2 - step_width_4) / width,
+						{
+							angle = math.random(-15, 0),
+							bank_left = bank_angle,
+							bank_right = bank_angle,
+						})
+				end
+			else
 				if math.random() > 0.5 then
 					local bank_angle = math.random(5, 45)
 					local runoff_angle = math.random(5, 45)
