@@ -23,6 +23,18 @@ import '../aeros/aeros'
 
 
 
+
+-- globally available settings
+local settings = registry.link_table('slime_mountain', {
+	spawn_slimes = true,
+	slime_size_factor = 5,
+})
+
+
+
+
+
+
 local SlimeAI
 SlimeAI = class 'pyros.SlimeAI' {
 	_init = function (self, size, model)
@@ -421,7 +433,7 @@ SlimeMountainBlueprint = class 'pyros.slime.SlimeMountainBlueprint' {
 }
 
 
-function slime_zigzag_mountain_generator (width, length, angle)
+local function slime_zigzag_mountain_generator (width, length, angle)
 	local blueprint = new 'pyros.slime.SlimeMountainBlueprint' (width, length, angle)
 
 	local offset = 0
@@ -439,7 +451,7 @@ function slime_zigzag_mountain_generator (width, length, angle)
 	return blueprint
 end
 
-function slime_mountain_generator (width, length, angle)
+local function slime_mountain_generator (width, length, angle)
 	local blueprint = new 'pyros.slime.SlimeMountainBlueprint' (width, length, angle)
 
 	local offset = 20
@@ -550,7 +562,7 @@ function slime_mountain_generator (width, length, angle)
 end
 
 
-function multi_slope_slime_mountain_generator(width, count, opts)
+local function multi_slope_slime_mountain_generator(width, count, opts)
 	local bp = new 'hydros.ModelBlueprint' ()
 	local position = {0, 0, 0}
 
@@ -578,15 +590,11 @@ end
 
 
 
-function start_mountain_slime_waves(width, orginal_size, parent, offset)
+local function start_mountain_slime_waves(width, orginal_size, parent, offset)
 	local cf = offset
 	local tick = 0.1
 
 	cw(function ()
-		local settings = registry.link_table('slime_mountain', {
-			spawn_slimes = true,
-			slime_size_factor = 5,
-		})
 		while true do
 			while settings.spawn_slimes ~= true do
 				wait(1)
@@ -612,8 +620,46 @@ function start_mountain_slime_waves(width, orginal_size, parent, offset)
 end
 
 
+
+local function spawn_slime_cluster(cf, target, size, count, parent)
+	for i = 1, count do
+		new 'pyros.SlimeBlueprint' (size, 3 * (4/3) * math.pi * size^3 ) -- formula of a sphere
+			:build({ cframe = cf * CFrame.new(-size * 2, size * 2, 0)
+				* CFrame.new(0, math.random() * size, target.z + (math.random() - 0.5) * size ) }).Parent = parent
+	end
+end
+
+local function start_slime_mountain_checkpoints(top, xstart, xend)
+	players.on_character(function (player, char)
+		local checkpoint = {
+			false,
+			false,
+			false,
+			false,
+		}
+		while char:FindFirstChild('Torso') ~= nil do
+			local torso = char:FindFirstChild('Torso')
+			if checkpoint[1] == false and torso.Position.x - xstart >= (xend - xstart) * 0.2 then
+				checkpoint[1] = true
+				spawn_slime_cluster(top, torso.Position, 14, 7, workspace)
+			elseif checkpoint[2] == false and torso.Position.x - xstart >= (xend - xstart) * 0.45 then
+				checkpoint[2] = true
+				spawn_slime_cluster(top, torso.Position, 14, 7, workspace)
+			elseif checkpoint[3] == false and torso.Position.x - xstart >= (xend - xstart) * 0.7 then
+				checkpoint[3] = true
+				spawn_slime_cluster(top, torso.Position, 14, 7, workspace)
+			elseif checkpoint[4] == false and torso.Position.x - xstart >= xend - xstart then
+				checkpoint[4] = true
+				print('winrar')
+			end
+			wait(3)
+		end
+	end)
+end
+
 return export {
 	slime_mountain_generator = slime_mountain_generator,
 	multi_slope_slime_mountain_generator = multi_slope_slime_mountain_generator,
 	start_mountain_slime_waves = start_mountain_slime_waves,
+	start_slime_mountain_checkpoints = start_slime_mountain_checkpoints,
 }
