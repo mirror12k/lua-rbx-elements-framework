@@ -128,6 +128,28 @@ local function hook_key(key, fun)
 	in_memory_registry[key]:on_change(fun)
 end
 
+typename_to_valname = {
+	boolean = 'Bool',
+	number = 'Number',
+	string = 'String',
+}
+
+local function link_table (key, obj)
+	for k,v in pairs(obj) do
+		create_key(key .. '.' .. k, typename_to_valname[type(v)], v)
+		hook_key(key .. '.' .. k, function (val) obj[k] = val end)
+	end
+
+	return setmetatable(obj, {
+		__index = function (t, k)
+			get_key(key .. '.' .. k)
+		end,
+		__newindex = function (t, k, v)
+			set_key(key .. '.' .. k, v)
+		end,
+	})
+end
+
 
 
 return export {
@@ -139,5 +161,7 @@ return export {
 		set = set_key,
 
 		on_change = hook_key,
+
+		link_table = link_table,
 	}
 }

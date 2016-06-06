@@ -583,15 +583,17 @@ function start_mountain_slime_waves(width, orginal_size, parent, offset)
 	local tick = 0.1
 
 	cw(function ()
-		local v = block.value('spawn_slimes', 'Bool', true)
-		v.Parent = game.ServerStorage
-		while v.Parent ~= nil do
-			while v.Value ~= true do
+		local settings = registry.link_table('slime_mountain', {
+			spawn_slimes = true,
+			slime_size_factor = 5,
+		})
+		while true do
+			while settings.spawn_slimes ~= true do
 				wait(1)
 			end
 
 			tick = tick + 0.1
-			local size = orginal_size + (((math.noise(tick * 4, 54653.215, 15.36375) + 0.5) * 2) ^ 2) * 5
+			local size = orginal_size + (((math.noise(tick * 4, 54653.215, 15.36375) + 0.5) * 2) ^ 2) * settings.slime_size_factor
 
 			local count = 0
 			local spawned = 0
