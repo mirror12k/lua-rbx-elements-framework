@@ -439,13 +439,13 @@ local function slime_zigzag_mountain_generator (width, length, angle)
 	local offset = 0
 	local is_left = true
 	while offset < length do
-		local step_length = math.random(20, 70)
+		local step_length = math.random(10, 70)
 		if offset + step_length < length then
 			local direction = is_left and 'left' or 'right'
 			is_left = not is_left
 			blueprint:add_zigzag(direction, offset / length, step_length / length, 0, 1, {})
 		end
-		offset = offset + step_length + math.random(5, 30) * 0.1
+		offset = offset + step_length + math.random(10, 30) * 0.1
 	end
 
 	return blueprint
@@ -570,16 +570,16 @@ local function multi_slope_slime_mountain_generator(width, count, opts)
 	local bp = new 'hydros.ModelBlueprint' ()
 	local position = {0, 0, 0}
 
-	local zigzag_generated = false
+	opts.requirements = opts.requirements or {}
 
 	for i = 1, count do
 		local length = math.random(opts.min_length or 200, opts.max_length or 400)
-		local angle = math.random(opts.min_angle or 30, opts.max_angle or 40)
+		local angle = math.random(opts.min_angle or 30, opts.max_angle or 45)
 
 		local mountain
-		if math.random() > 0.4 and zigzag_generated == false then
-			zigzag_generated = true
-			mountain = slime_zigzag_mountain_generator(width, length / 2, angle)
+
+		if opts.requirements[i].type == 'zigzag' then
+			mountain = slime_zigzag_mountain_generator(width, length * 0.75, angle)
 		else
 			mountain = slime_mountain_generator(width, length, angle)
 		end
@@ -664,7 +664,13 @@ end
 
 
 local function start_slime_mountain()
-	local mountain, top = multi_slope_slime_mountain_generator(150, 3, {})
+	local mountain, top = multi_slope_slime_mountain_generator(150, 3, {
+			requirements = {
+				{},
+				{ type = 'zigzag' },
+				{},
+			}
+	})
 	mountain:build().Parent = workspace
 
 	block.spawn('spawn', {10, 1, 10}, {0, 50, 50}).Parent = workspace
