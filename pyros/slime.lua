@@ -503,8 +503,20 @@ local function slime_mountain_generator (width, length, angle)
 							bank_left = { angle = bank_angle, runoff_angle = runoff_angle },
 							bank_right = { angle = bank_angle, runoff_angle = runoff_angle },
 						})
-					bank_angle = math.random(5, 45)
-					runoff_angle = math.random(5, 45)
+				else
+					local bank_angle = math.random(20, 60)
+					blueprint:add_mountain_step(
+						offset / length, step_length / length, step_width_1 / width, (step_width_3 - step_width_1) / width,
+						{
+							angle = math.random(-15, 0),
+							bank_left = bank_angle,
+							bank_right = bank_angle,
+						})
+				end
+
+				if math.random() > 0.5 then
+					local bank_angle = math.random(5, 45)
+					local runoff_angle = math.random(5, 45)
 					blueprint:add_mountain_crack(
 						offset / length, step_length / length, step_width_4 / width, (step_width_2 - step_width_4) / width,
 						{
@@ -515,14 +527,6 @@ local function slime_mountain_generator (width, length, angle)
 						})
 				else
 					local bank_angle = math.random(20, 60)
-					blueprint:add_mountain_step(
-						offset / length, step_length / length, step_width_1 / width, (step_width_3 - step_width_1) / width,
-						{
-							angle = math.random(-15, 0),
-							bank_left = bank_angle,
-							bank_right = bank_angle,
-						})
-					bank_angle = math.random(20, 60)
 					blueprint:add_mountain_step(
 						offset / length, step_length / length, step_width_4 / width, (step_width_2 - step_width_4) / width,
 						{
@@ -657,9 +661,24 @@ local function start_slime_mountain_checkpoints(top, xstart, xend)
 	end)
 end
 
+
+
+local function start_slime_mountain()
+	local mountain, top = multi_slope_slime_mountain_generator(150, 3, {})
+	mountain:build().Parent = workspace
+
+	block.spawn('spawn', {10, 1, 10}, {0, 50, 50}).Parent = workspace
+
+	start_mountain_slime_waves(150, 10, workspace, CFrame.new(vector.table_to_vector3(top)))
+	start_slime_mountain_checkpoints(CFrame.new(vector.table_to_vector3(top)), 0, top[1])
+end
+
 return export {
-	slime_mountain_generator = slime_mountain_generator,
-	multi_slope_slime_mountain_generator = multi_slope_slime_mountain_generator,
-	start_mountain_slime_waves = start_mountain_slime_waves,
-	start_slime_mountain_checkpoints = start_slime_mountain_checkpoints,
+	slime_mountain = {
+		mountain_generator = mountain_generator,
+		multi_slope_mountain_generator = multi_slope_mountain_generator,
+		start_slime_waves = start_slime_waves,
+		start_mountain_checkpoints = start_mountain_checkpoints,
+		start = start_slime_mountain,
+	}
 }

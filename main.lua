@@ -235,10 +235,4 @@ import 'pyros/pyros'
 
 math.randomseed(tick())
 
-local mountain, top = multi_slope_slime_mountain_generator(150, 3, {})
-mountain:build().Parent = workspace
-
-block.spawn('spawn', {10, 1, 10}, {0, 50, 50}).Parent = workspace
-
-start_mountain_slime_waves(150, 10, workspace, CFrame.new(vector.table_to_vector3(top)))
-start_slime_mountain_checkpoints(CFrame.new(vector.table_to_vector3(top)), 0, top[1])
+slime_mountain.start()
