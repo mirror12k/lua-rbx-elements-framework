@@ -528,11 +528,12 @@ local function start_mountain_slime_waves(width, orginal_size, parent, offset)
 
 			local count = 0
 			local spawned = 0
+			local color = vector.color3_to_table(Color3.fromHSV(math.random(), 1, 1))
 			for i = 0, width, size do
 				count = count + 1
 				if math.noise(tick, 15678.215, i * 0.125) > 0 then
 					spawned = spawned + 1
-					new 'pyros.SlimeBlueprint' (size, 3 * (4/3) * math.pi * size^3 ) -- formula of a sphere
+					new 'pyros.SlimeBlueprint' (size, 3 * (4/3) * math.pi * size^3, color) -- formula of a sphere
 						:build({ cframe = cf * CFrame.new(-size * 2, size * 2, 0)
 							* CFrame.new(0, math.random() * size, i + (math.random() - 0.5) * size ) }).Parent = parent
 				end
@@ -545,8 +546,9 @@ end
 
 
 local function spawn_slime_cluster(cf, target, size, count, parent)
+	local color = vector.color3_to_table(Color3.fromHSV(math.random(), 1, 1))
 	for i = 1, count do
-		new 'pyros.SlimeBlueprint' (size, 3 * (4/3) * math.pi * size^3 ) -- formula of a sphere
+		new 'pyros.SlimeBlueprint' (size, 3 * (4/3) * math.pi * size^3, color) -- formula of a sphere
 			:build({ cframe = cf * CFrame.new(-size * 2, size * 2, 0)
 				* CFrame.new(0, math.random() * size, target.z + (math.random() - 0.5) * size ) }).Parent = parent
 	end
