@@ -18,11 +18,12 @@ end
 
 import '../lithos/lithos'
 
-local exports = {}
-table_append(exports, import('city', 'import_list'))
-table_append(exports, import('military', 'import_list'))
-table_append(exports, import('noise', 'import_list'))
 
 
+return re_export(import,
+qw[[
+	city
+	military
+	noise
+]])
 
-return export(exports)

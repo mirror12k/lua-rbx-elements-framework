@@ -18,10 +18,9 @@ end
 
 import '../lithos/lithos'
 
-local exports = {}
-table_append(exports, import('slime', 'import_list'))
-table_append(exports, import('flight', 'import_list'))
-
-
-
-return export(exports)
+return re_export(import,
+qw[[
+	slime
+	slime_mountain
+	flight
+]])

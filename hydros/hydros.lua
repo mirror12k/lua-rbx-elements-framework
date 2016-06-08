@@ -18,16 +18,15 @@ end
 
 import '../lithos/lithos'
 
-local exports = {}
-table_append(exports, import('vector', 'import_list'))
-table_append(exports, import('block', 'import_list'))
-table_append(exports, import('blueprint', 'import_list'))
-table_append(exports, import('draw', 'import_list'))
-table_append(exports, import('geometry', 'import_list'))
-table_append(exports, import('spaceful', 'import_list'))
-table_append(exports, import('registry', 'import_list'))
-table_append(exports, import('players', 'import_list'))
 
-
-
-return export(exports)
+return re_export(import,
+qw[[
+	vector
+	block
+	blueprint
+	draw
+	geometry
+	spaceful
+	registry
+	players
+]])

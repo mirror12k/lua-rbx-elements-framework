@@ -18,19 +18,20 @@ end
 
 import 'module'
 import 'util'
-
-local exports = {}
-table_append(exports, import('debug', 'import_list'))
-table_append(exports, import('math', 'import_list'))
-table_append(exports, import('oop', 'import_list'))
-table_append(exports, import('stringy', 'import_list'))
-table_append(exports, import('test', 'import_list'))
-table_append(exports, import('util', 'import_list'))
-table_append(exports, import('freeze', 'import_list'))
-table_append(exports, import('thread', 'import_list'))
-
-table_append(exports, import('module', 'import_list'))
+import 'stringy'
 
 
 
-return export(exports)
+
+return re_export(import,
+qw[[
+	debug
+	math
+	module
+	oop
+	stringy
+	test
+	util
+	freeze
+	thread
+]])

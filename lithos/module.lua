@@ -1,4 +1,20 @@
 
+local import
+if script ~= nil then
+	import = function (name, arg)
+		local target = script.Parent
+		string.gsub(name, "([^/]+)", function(s) if s == '..' then target = target.Parent else target = target[s] end end)
+		return require(target)(arg)
+	end
+else
+	-- mostly taken from https://stackoverflow.com/questions/9145432/load-lua-files-by-relative-path
+	local location = ((...) == nil and './') or (...):match("(.-)[^%/]+$")
+	import = function (name, arg)
+		local target = location .. name
+		while string.match(target, '/[^/]+/../') do target = string.gsub(target, '/[^/]+/../', '/') end
+		return require(target)(arg)
+	end
+end
 
 
 local export
@@ -52,6 +68,18 @@ end
 
 
 
+function re_export (import_function, modules_list)
+	local exports = {}
+	for _, module_name in ipairs(modules_list) do
+		for k, v in pairs(import_function(module_name, 'import_list')) do
+			exports[k] = v
+		end
+	end
+	return export (exports)
+end
+
+
 return export {
 	export = export,
+	re_export = re_export,
 }
