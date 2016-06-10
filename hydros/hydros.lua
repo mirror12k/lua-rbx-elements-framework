@@ -29,4 +29,5 @@ qw[[
 	spaceful
 	registry
 	players
+	trigger
 ]])

@@ -20,7 +20,8 @@ import '../lithos/lithos'
 
 
 
-local active_users = {}
+local active_players = {}
+local active_characters = {}
 
 
 local on_player_hooks = {}
@@ -34,6 +35,11 @@ local on_chat_hooks = {}
 
 
 
+
+
+
+
+
 local function character_died(player, character)
 	for _, f in ipairs(on_character_died_hooks) do
 		f(player, character)
@@ -41,6 +47,8 @@ local function character_died(player, character)
 end
 
 local function character_added(player, character)
+	active_characters[player.UserId] = character
+
 	for _, f in ipairs(on_character_hooks) do
 		f(player, character)
 	end
@@ -54,6 +62,8 @@ local function character_added(player, character)
 end
 
 local function character_removed(player, character)
+	active_characters[player.UserId] = nil
+
 	for _, f in ipairs(on_character_removed_hooks) do
 		f(player, character)
 	end
@@ -66,7 +76,7 @@ local function character_chatted(player, message, recipient)
 end
 
 local function player_added(player)
-	active_users[player.UserId] = player
+	active_players[player.UserId] = player
 	-- hook the player events
 	player.CharacterAdded:connect(function (character) character_added(player, character) end)
 	player.CharacterRemoving:connect(function (character) character_removed(player, character) end)
@@ -78,7 +88,7 @@ local function player_added(player)
 end
 
 local function player_removed(player)
-	active_users[player.UserId] = nil
+	active_players[player.UserId] = nil
 
 	for _, f in ipairs(on_player_left_hooks) do
 		f(player)
@@ -97,6 +107,14 @@ if script ~= nil then
 end
 
 
+
+
+local function get_active_players()
+	return active_players
+end
+local function get_active_characters()
+	return active_characters
+end
 
 
 local function on_player(fun)
@@ -122,6 +140,9 @@ end
 
 return export {
 	players = {
+		get_active_players = get_active_players,
+		get_active_characters = get_active_characters,
+		
 		on_player = on_player,
 		on_player_left = on_player_left,
 		on_character = on_character,
