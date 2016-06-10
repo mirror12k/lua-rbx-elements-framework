@@ -20,6 +20,7 @@ import '../lithos/lithos'
 
 import 'block'
 import 'players'
+import 'registry'
 
 
 
@@ -27,6 +28,13 @@ local trigger_storage
 if script ~= nil then
 	trigger_storage = block.model('gameworks_triggers')
 	trigger_storage.Parent = workspace
+
+	registry.create('trigger.transparency', 'Number', 1)
+	registry.on_change('trigger.transparency', function (val)
+		for _, trigger in ipairs(trigger_storage:GetChildren()) do
+			trigger.Transparency = val
+		end
+	end)
 end
 
 
@@ -37,7 +45,8 @@ local function character_trigger (size, position, fun, opts)
 
 	local b = block.block(opts.name, size, position, opts.rotation)
 	b.CanCollide = false
-	b.Transparency = 1
+	b.Locked = true
+	b.Transparency = registry.get('trigger.transparency')
 	b.Parent = opts.parent or trigger_storage
 	b.Touched:connect(function (other)
 		other = other.Parent
