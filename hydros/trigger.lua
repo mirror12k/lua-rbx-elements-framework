@@ -39,9 +39,16 @@ end
 
 
 
+local delay_debounce_finish = cww(function (delay, debounce, key)
+	wait(delay)
+	debounce[key] = nil
+end)
+
 
 local function character_trigger (size, position, fun, opts)
 	opts = opts or {}
+
+	local character_debounce = {}
 
 	local b = block.block(opts.name, size, position, opts.rotation)
 	b.CanCollide = false
@@ -50,14 +57,23 @@ local function character_trigger (size, position, fun, opts)
 	b.Parent = opts.parent or trigger_storage
 	b.Touched:connect(function (other)
 		other = other.Parent
+		-- verify that it could be a character
 		if other ~= nil and other:FindFirstChild('Humanoid') ~= nil then
+			-- find which character it is
 			for id, char in pairs(players.get_active_characters()) do
-				if char == other then
+				if char == other and character_debounce[id] == nil then
+					-- perform debounce if necessary
+					if opts.debounce ~= nil then
+						character_debounce[id] = true
+						delay_debounce_finish(opts.debounce, character_debounce, id)
+					end
+					-- invoke callback
 					return fun(id, char)
 				end
 			end
 		end
 	end)
+	-- part is returned so that a trigger can later be deleted or toggled on-off by adding or removing it
 	return b
 end
 

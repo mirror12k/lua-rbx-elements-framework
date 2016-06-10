@@ -24,6 +24,12 @@ local function cw(fun, ...)
 	return coroutine.wrap(fun)(...)
 end
 
+local function cww(fun)
+	return function (...)
+		return cw(fun, ...)
+	end
+end
+
 local function timeout_run(fun, delay, ...)
 	wait(delay)
 	fun(...)
@@ -48,6 +54,7 @@ end
 
 return export {
 	cw = cw,
+	cww = cww,
 	timeout = timeout,
 	interval = interval,
 }
