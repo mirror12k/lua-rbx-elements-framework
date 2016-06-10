@@ -58,26 +58,30 @@ end
 local function hook_character_trigger(trigger, fun, opts)
 	local character_debounce = {}
 	trigger.Touched:connect(function (other)
-		other = other.Parent
-		-- verify that it could be a character
-		if other ~= nil and other:FindFirstChild('Humanoid') ~= nil then
-			-- find which character it is
-			for id, char in pairs(players.get_active_characters()) do
-				if char == other and character_debounce[id] == nil then
-					-- perform debounce if necessary
-					if opts.debounce ~= nil then
-						character_debounce[id] = true
-						delay_debounce_finish(opts.debounce, character_debounce, id)
+		-- verify that this is the torso
+		-- otherwise what might happen is that a gibbed body part might fly off and activate a trigger accidentally
+		if other.Name == 'Torso' then
+			other = other.Parent
+			-- verify that it could be a character and is not dead
+			if other ~= nil and other:FindFirstChild('Humanoid') ~= nil and other.Humanoid.Health > 0 then
+				-- find which character it is
+				for id, char in pairs(players.get_active_characters()) do
+					if char == other and character_debounce[id] == nil then
+						-- perform debounce if necessary
+						if opts.debounce ~= nil then
+							character_debounce[id] = true
+							delay_debounce_finish(opts.debounce, character_debounce, id)
+						end
+						-- invoke callback
+						return fun(trigger, id, char)
 					end
-					-- invoke callback
-					return fun(trigger, id, char)
 				end
 			end
 		end
 	end)
 end
 
--- creates an invisible trigger block which detects when a player character touches it and fires the callback
+-- creates an invisible trigger block which detects when a player character's torso touches it and fires the callback
 -- returns the created trigger part which can be destroyed to delete the trigger
 -- opts can contain a debounce in seconds to prevent a single character triggering it multiple times
 local function character_trigger (size, position, fun, opts)
@@ -97,7 +101,7 @@ local function hook_disposable_character_trigger(trigger, character, fun, opts)
 
 	local connection
 	connection = character:FindFirstChild('Torso').Touched:connect(function (other)
-		if other == trigger then
+		if character.Humanoid.Health > 0 and other == trigger then
 			connection:disconnect()
 			return fun(trigger, character)
 		end
