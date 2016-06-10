@@ -237,6 +237,6 @@ math.randomseed(tick())
 
 -- slime_mountain.start()
 
-trigger.character_trigger({10, 100, 100}, {50, 50, 0}, function (id, char)
-	print('character of ' .. id .. ' tripped the trigger!')
+trigger.disposable_character_trigger({10, 100, 100}, {50, 50, 0}, function (trigger, char)
+	print('character of ' .. char.Name .. ' tripped the trigger!')
 end, { debounce = 3 })

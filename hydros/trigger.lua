@@ -45,17 +45,19 @@ local delay_debounce_finish = cww(function (delay, debounce, key)
 end)
 
 
-local function character_trigger (size, position, fun, opts)
-	opts = opts or {}
+local function create_trigger(size, position, opts)
+	local p = block.block(opts.name or 'trigger', size, position, opts.rotation)
+	p.CanCollide = false
+	p.Locked = true
+	p.Transparency = registry.get('trigger.transparency')
+	p.Parent = opts.parent or trigger_storage
+	return p
+end
 
+
+local function hook_character_trigger(trigger, fun, opts)
 	local character_debounce = {}
-
-	local b = block.block(opts.name, size, position, opts.rotation)
-	b.CanCollide = false
-	b.Locked = true
-	b.Transparency = registry.get('trigger.transparency')
-	b.Parent = opts.parent or trigger_storage
-	b.Touched:connect(function (other)
+	trigger.Touched:connect(function (other)
 		other = other.Parent
 		-- verify that it could be a character
 		if other ~= nil and other:FindFirstChild('Humanoid') ~= nil then
@@ -68,13 +70,51 @@ local function character_trigger (size, position, fun, opts)
 						delay_debounce_finish(opts.debounce, character_debounce, id)
 					end
 					-- invoke callback
-					return fun(id, char)
+					return fun(trigger, id, char)
 				end
 			end
 		end
 	end)
-	-- part is returned so that a trigger can later be deleted or toggled on-off by adding or removing it
-	return b
+end
+
+-- creates an invisible trigger block which detects when a player character touches it and fires the callback
+-- returns the created trigger part which can be destroyed to delete the trigger
+-- opts can contain a debounce in seconds to prevent a single character triggering it multiple times
+local function character_trigger (size, position, fun, opts)
+	opts = opts or {}
+	local trigger = create_trigger(size, position, opts)
+
+	hook_character_trigger(trigger, fun, opts)
+	-- part is returned so that the trigger can later be deleted or toggled on-off by adding or removing it
+	return trigger
+end
+
+
+-- a different implementation of a trigger by hooking the character's Touched instead of the trigger's Touched
+-- this allows per-character removal of triggers and a much simpler and less expensive trigger mechanism
+local function hook_disposable_character_trigger(trigger, character, fun, opts)
+	opts = opts or {}
+
+	local connection
+	connection = character:FindFirstChild('Torso').Touched:connect(function (other)
+		if other == trigger then
+			connection:disconnect()
+			return fun(trigger, character)
+		end
+	end)
+end
+
+
+
+local function disposable_character_trigger(size, position, fun, opts)
+	opts = opts or {}
+	local trigger = create_trigger(size, position, opts)
+
+	players.on_character(function (player, character)
+		hook_disposable_character_trigger(trigger, character, fun, opts)
+	end)
+	-- part is returned so that the trigger can later be deleted or toggled on-off by adding or removing it
+	return trigger
 end
 
 
@@ -84,7 +124,11 @@ end
 
 return export {
 	trigger = {
+		create_trigger = create_trigger,
+		hook_character_trigger = hook_character_trigger,
 		character_trigger = character_trigger,
+		hook_disposable_character_trigger = hook_disposable_character_trigger,
+		disposable_character_trigger = disposable_character_trigger,
 	}
 }
 
