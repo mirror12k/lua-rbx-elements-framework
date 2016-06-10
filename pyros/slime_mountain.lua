@@ -28,10 +28,12 @@ import 'slime'
 
 
 -- globally available settings
-local settings = registry.link_table('slime_mountain', {
+-- they are put into the registry under 'slime_mountain' when start_slime_mountain is called
+local settings = {
 	spawn_slimes = true,
+	spawn_slime_checkpoints = true,
 	slime_size_factor = 5,
-})
+}
 
 
 
@@ -554,37 +556,34 @@ local function spawn_slime_cluster(cf, target, size, count, parent)
 	end
 end
 
-local function start_slime_mountain_checkpoints(top, xstart, xend)
-	players.on_character(function (player, char)
-		local checkpoint = {
-			false,
-			false,
-			false,
-			false,
-		}
-		while char:FindFirstChild('Torso') ~= nil do
+local function start_slime_mountain_checkpoints(bottom, top, width, delta)
+	-- slime checkpoint waves
+	for _, offset in ipairs({0.2, 0.45, 0.7}) do
+		trigger.disposable_character_trigger({10, 400, width},
+			{bottom[1] + (top[1] - bottom[1]) * offset, bottom[2] + (top[2] - bottom[2]) * offset, width / 2},
+			function (trigger, char)
+				local torso = char:FindFirstChild('Torso')
+				if torso ~= nil  and settings.spawn_slime_checkpoints == true then
+					spawn_slime_cluster(CFrame.new(unpack(top)), torso.Position, 14, 7, workspace)
+				end
+			end)
+	end
+	-- win trigger
+	trigger.disposable_character_trigger({10, 100, width}, {top[1], 50 + top[2], width / 2},
+		function (trigger, char)
 			local torso = char:FindFirstChild('Torso')
-			if checkpoint[1] == false and torso.Position.x - xstart >= (xend - xstart) * 0.2 then
-				checkpoint[1] = true
-				spawn_slime_cluster(top, torso.Position, 14, 7, workspace)
-			elseif checkpoint[2] == false and torso.Position.x - xstart >= (xend - xstart) * 0.45 then
-				checkpoint[2] = true
-				spawn_slime_cluster(top, torso.Position, 14, 7, workspace)
-			elseif checkpoint[3] == false and torso.Position.x - xstart >= (xend - xstart) * 0.7 then
-				checkpoint[3] = true
-				spawn_slime_cluster(top, torso.Position, 14, 7, workspace)
-			elseif checkpoint[4] == false and torso.Position.x - xstart >= xend - xstart then
-				checkpoint[4] = true
+			if torso ~= nil then
 				print('winrar')
 			end
-			wait(3)
-		end
-	end)
+		end)
 end
 
 
 
 local function start_slime_mountain()
+	-- register the settings for global access
+	registry.link_table('slime_mountain', settings)
+
 	local mountain, top = multi_slope_slime_mountain_generator(150, 3, {
 			requirements = {
 				{},
@@ -597,7 +596,7 @@ local function start_slime_mountain()
 	block.spawn('spawn', {10, 1, 10}, {0, 50, 50}).Parent = workspace
 
 	start_mountain_slime_waves(150, 10, workspace, CFrame.new(vector.table_to_vector3(top)))
-	start_slime_mountain_checkpoints(CFrame.new(vector.table_to_vector3(top)), 0, top[1])
+	start_slime_mountain_checkpoints({0, 0, 0}, top, 150)
 end
 
 return export {

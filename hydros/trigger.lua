@@ -94,8 +94,6 @@ local function character_trigger (size, position, fun, opts)
 end
 
 
--- a different implementation of a trigger by hooking the character's Touched instead of the trigger's Touched
--- this allows per-character removal of triggers and a much simpler and less expensive trigger mechanism
 local function hook_disposable_character_trigger(trigger, character, fun, opts)
 	opts = opts or {}
 
@@ -110,6 +108,8 @@ end
 
 
 
+-- a different implementation of a trigger by hooking the character's Touched instead of the trigger's Touched
+-- this allows per-character removal of triggers and a much simpler and less expensive trigger mechanism
 local function disposable_character_trigger(size, position, fun, opts)
 	opts = opts or {}
 	local trigger = create_trigger(size, position, opts)
