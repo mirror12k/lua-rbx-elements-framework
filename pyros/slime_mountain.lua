@@ -546,6 +546,19 @@ local function start_mountain_slime_waves(width, orginal_size, parent, offset)
 end
 
 
+local function generate_mountain_top_platform(width)
+	local bp = new 'hydros.ModelBlueprint' ()
+
+	local length = 100
+
+	bp:add_part('base', {length, 5, width}, {50, -2.5, width / 2}, nil, { surface = Enum.SurfaceType.SmoothNoOutlines })
+
+	local dimension = ((length ^ 2) / 2) ^ 0.5
+	bp:add_part('base_edge', {dimension, 5, dimension}, {50, -2.5, 0}, {0, 45, 0}, { surface = Enum.SurfaceType.SmoothNoOutlines })
+	bp:add_part('base_edge', {dimension, 5, dimension}, {50, -2.5, width}, {0, 45, 0}, { surface = Enum.SurfaceType.SmoothNoOutlines })
+
+	return bp
+end
 
 local function spawn_slime_cluster(cf, target, size, count, parent)
 	local color = vector.color3_to_table(Color3.fromHSV(math.random(), 1, 1))
@@ -591,7 +604,12 @@ local function start_slime_mountain()
 				{},
 			}
 	})
+	local mountain_top = generate_mountain_top_platform(150)
+
 	mountain:build().Parent = workspace
+	mountain_top:build({ cframe = CFrame.new(unpack(top)) }).Parent = workspace
+
+
 
 	block.spawn('spawn', {10, 1, 10}, {0, 50, 50}).Parent = workspace
 
