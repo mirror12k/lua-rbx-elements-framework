@@ -551,11 +551,13 @@ local function generate_mountain_top_platform(width)
 
 	local length = 100
 
-	bp:add_part('base', {length, 5, width}, {50, -2.5, width / 2}, nil, { surface = Enum.SurfaceType.SmoothNoOutlines })
+	bp:add_part('base', {length, 5, width}, {length / 2, -2.5, width / 2}, nil, { surface = Enum.SurfaceType.SmoothNoOutlines })
 
 	local dimension = ((length ^ 2) / 2) ^ 0.5
-	bp:add_part('base_edge', {dimension, 5, dimension}, {50, -2.5, 0}, {0, 45, 0}, { surface = Enum.SurfaceType.SmoothNoOutlines })
-	bp:add_part('base_edge', {dimension, 5, dimension}, {50, -2.5, width}, {0, 45, 0}, { surface = Enum.SurfaceType.SmoothNoOutlines })
+	bp:add_part('base_edge', {dimension, 5, dimension}, {length / 2, -2.5, 0}, {0, 45, 0}, { surface = Enum.SurfaceType.SmoothNoOutlines })
+	bp:add_part('base_edge', {dimension, 5, dimension}, {length / 2, -2.5, width}, {0, 45, 0}, { surface = Enum.SurfaceType.SmoothNoOutlines })
+
+	bp:add_part('teleporter', {4, 10, 4}, {length - 8 / 2, 5, width / 2}, nil, { transparency = 0.5, color = {0.2, 1, 0.2}, cancollide = false })
 
 	return bp
 end
@@ -569,26 +571,42 @@ local function spawn_slime_cluster(cf, target, size, count, parent)
 	end
 end
 
-local function start_slime_mountain_checkpoints(bottom, top, width, delta)
+local function start_slime_mountain_checkpoints(bottom, top, width, teleporter)
+	local game_triggers = {}
 	-- slime checkpoint waves
 	for _, offset in ipairs({0.2, 0.45, 0.7}) do
-		trigger.disposable_character_trigger({10, 400, width},
-			{bottom[1] + (top[1] - bottom[1]) * offset, bottom[2] + (top[2] - bottom[2]) * offset, width / 2},
-			function (trigger, char)
+
+		local new_trigger = {}
+		new_trigger.op = function (trigger, char)
 				local torso = char:FindFirstChild('Torso')
 				if torso ~= nil  and settings.spawn_slime_checkpoints == true then
 					spawn_slime_cluster(CFrame.new(unpack(top)), torso.Position, 14, 7, workspace)
 				end
-			end)
+			end
+		new_trigger.trigger = trigger.disposable_character_trigger({10, 400, width},
+			{bottom[1] + (top[1] - bottom[1]) * offset, bottom[2] + (top[2] - bottom[2]) * offset, width / 2},
+			new_trigger.op)
+		game_triggers[#game_triggers + 1] = new_trigger
 	end
 	-- win trigger
-	trigger.disposable_character_trigger({10, 100, width}, {top[1], 50 + top[2], width / 2},
-		function (trigger, char)
+	-- make it a little wider to make sure it catches everyone
+	local new_trigger = {}
+	new_trigger.op = function (trigger, char)
 			local torso = char:FindFirstChild('Torso')
 			if torso ~= nil then
 				print('winrar')
 			end
-		end)
+		end
+	new_trigger.trigger = trigger.disposable_character_trigger({10, 100, width + 40}, {top[1], 50 + top[2], width / 2}, new_trigger.op)
+	game_triggers[#game_triggers + 1] = new_trigger
+
+	trigger.hook_character_absolute_teleport(teleporter, {bottom[1], bottom[2] + 50, bottom[3] + 50}, function (_, id, char)
+		-- rehook all events on trigger
+		for _, game_trigger in ipairs(game_triggers) do
+			trigger.hook_disposable_character_trigger(game_trigger.trigger, char, game_trigger.op)
+		end
+	end)
+
 end
 
 
@@ -597,24 +615,27 @@ local function start_slime_mountain()
 	-- register the settings for global access
 	registry.link_table('slime_mountain', settings)
 
-	local mountain, top = multi_slope_slime_mountain_generator(150, 3, {
+	local width = 150
+
+	local mountain, top = multi_slope_slime_mountain_generator(width, 3, {
 			requirements = {
 				{},
 				{ type = 'zigzag' },
 				{},
 			}
 	})
-	local mountain_top = generate_mountain_top_platform(150)
+	local mountain_top = generate_mountain_top_platform(width)
 
 	mountain:build().Parent = workspace
-	mountain_top:build({ cframe = CFrame.new(unpack(top)) }).Parent = workspace
+	local mountain_top_model = mountain_top:build({ cframe = CFrame.new(unpack(top)) })
+	mountain_top_model.Parent = workspace
 
 
 
 	block.spawn('spawn', {10, 1, 10}, {0, 50, 50}).Parent = workspace
 
-	start_mountain_slime_waves(150, 10, workspace, CFrame.new(vector.table_to_vector3(top)))
-	start_slime_mountain_checkpoints({0, 0, 0}, top, 150)
+	start_mountain_slime_waves(width, 10, workspace, CFrame.new(vector.table_to_vector3(top)))
+	start_slime_mountain_checkpoints({0, 0, 0}, top, width, mountain_top_model.teleporter)
 end
 
 return export {

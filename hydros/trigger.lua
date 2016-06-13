@@ -21,6 +21,7 @@ import '../lithos/lithos'
 import 'block'
 import 'players'
 import 'registry'
+import 'vector'
 
 
 
@@ -46,6 +47,7 @@ end)
 
 
 local function create_trigger(size, position, opts)
+	opts = opts or {}
 	local p = block.block(opts.name or 'trigger', size, position, opts.rotation)
 	p.CanCollide = false
 	p.Locked = true
@@ -56,6 +58,7 @@ end
 
 
 local function hook_character_trigger(trigger, fun, opts)
+	opts = opts or {}
 	local character_debounce = {}
 	trigger.Touched:connect(function (other)
 		-- verify that this is the torso
@@ -85,7 +88,6 @@ end
 -- returns the created trigger part which can be destroyed to delete the trigger
 -- opts can contain a debounce in seconds to prevent a single character triggering it multiple times
 local function character_trigger (size, position, fun, opts)
-	opts = opts or {}
 	local trigger = create_trigger(size, position, opts)
 
 	hook_character_trigger(trigger, fun, opts)
@@ -95,8 +97,6 @@ end
 
 
 local function hook_disposable_character_trigger(trigger, character, fun, opts)
-	opts = opts or {}
-
 	local connection
 	connection = character:FindFirstChild('Torso').Touched:connect(function (other)
 		if character.Humanoid.Health > 0 and other == trigger then
@@ -111,7 +111,6 @@ end
 -- a different implementation of a trigger by hooking the character's Touched instead of the trigger's Touched
 -- this allows per-character removal of triggers and a much simpler and less expensive trigger mechanism
 local function disposable_character_trigger(size, position, fun, opts)
-	opts = opts or {}
 	local trigger = create_trigger(size, position, opts)
 
 	players.on_character(function (player, character)
@@ -125,6 +124,20 @@ end
 
 
 
+local function hook_character_absolute_teleport(trigger, position, fun, opts)
+	hook_character_trigger(trigger, function (trigger, id, character)
+		local humanoid = character:FindFirstChild('Humanoid')
+		local torso = character:FindFirstChild('Torso')
+		if torso ~= nil and humanoid ~= nil and humanoid.Health > 0 then
+			torso.CFrame = CFrame.new(unpack(position))
+			if fun ~= nil then
+				fun(trigger, id, character)
+			end
+		end
+	end, opts)
+end
+
+
 
 return export {
 	trigger = {
@@ -133,6 +146,7 @@ return export {
 		character_trigger = character_trigger,
 		hook_disposable_character_trigger = hook_disposable_character_trigger,
 		disposable_character_trigger = disposable_character_trigger,
+		hook_character_absolute_teleport = hook_character_absolute_teleport,
 	}
 }
 
