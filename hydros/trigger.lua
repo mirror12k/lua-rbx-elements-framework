@@ -40,13 +40,35 @@ end
 
 
 
+local TriggerObject = class 'hydros.TriggerObject' {
+	_init = function (self)
+		self:connect()
+		self.connected = true
+	end,
+	reconnect = function (self)
+		if self.connected == false then
+			self:connect()
+			self.connected = true
+		end
+	end,
+	disconnect = function (self)
+		if self.connected == true then
+			self:break_connection()
+			self.connected = false
+		end
+	end,
+}
+
+
+
+
 local delay_debounce_finish = cww(function (delay, debounce, key)
 	wait(delay)
 	debounce[key] = nil
 end)
 
 
-local function create_trigger(size, position, opts)
+local function create_trigger_part(size, position, opts)
 	opts = opts or {}
 	local p = block.block(opts.name or 'trigger', size, position, opts.rotation)
 	p.CanCollide = false
@@ -57,42 +79,58 @@ local function create_trigger(size, position, opts)
 end
 
 
-local function hook_character_trigger(trigger, fun, opts)
-	opts = opts or {}
-	local character_debounce = {}
-	trigger.Touched:connect(function (other)
-		-- verify that this is the torso
-		-- otherwise what might happen is that a gibbed body part might fly off and activate a trigger accidentally
-		if other.Name == 'Torso' then
-			other = other.Parent
-			-- verify that it could be a character and is not dead
-			if other ~= nil and other:FindFirstChild('Humanoid') ~= nil and other.Humanoid.Health > 0 then
-				-- find which character it is
-				for id, char in pairs(players.get_active_characters()) do
-					if char == other and character_debounce[id] == nil then
-						-- perform debounce if necessary
-						if opts.debounce ~= nil then
-							character_debounce[id] = true
-							delay_debounce_finish(opts.debounce, character_debounce, id)
-						end
-						-- invoke callback
-						return fun(trigger, id, char)
+
+local CharacterTrigger
+CharacterTrigger = class 'hydros.CharacterTrigger' {
+	_extends = TriggerObject,
+	_init = function (self, trigger_part, fun, debounce)
+		self.trigger_part = trigger_part
+		self.fun = fun
+		self.debounce = debounce
+		self.debounce_active = {}
+		CharacterTrigger.super._init(self)
+	end,
+	connect = function (self)
+		self.connection = self.trigger_part.Touched:connect(function (other)
+			-- verify that this is the torso and that it could be a character and is not dead
+			-- otherwise what might happen is that a gibbed body part might fly off and activate a trigger accidentally
+			if other.Name == 'Torso' and other.Parent ~= nil
+					and other.Parent:FindFirstChild('Humanoid') ~= nil and other.Parent.Humanoid.Health > 0 then
+				-- find which player it is
+				local player = game.Players:GetPlayerFromCharacter(other.Parent)
+				if not self.debounce_active[player.UserId] then
+					-- perform debounce if necessary
+					if self.debounce ~= nil then
+						self.debounce_active[player.UserId] = true
+						self:delay_debounce_finish(player.UserId)
 					end
+					-- invoke callback
+					return self.fun(self, player, other.Parent)
 				end
 			end
-		end
-	end)
+		end)
+	end,
+	break_connection = function (self)
+		self.connection:disconnect()
+	end,
+	delay_debounce_finish = cww(function (self, id)
+		wait(self.debounce)
+		self.debounce_active[id] = nil
+	end),
+}
+
+local function hook_character_trigger(trigger, fun, opts)
+	opts = opts or {}
+	return new 'hydros.CharacterTrigger' (trigger, fun, opts.debounce)
 end
 
 -- creates an invisible trigger block which detects when a player character's torso touches it and fires the callback
 -- returns the created trigger part which can be destroyed to delete the trigger
 -- opts can contain a debounce in seconds to prevent a single character triggering it multiple times
 local function character_trigger (size, position, fun, opts)
-	local trigger = create_trigger(size, position, opts)
+	local trigger = create_trigger_part(size, position, opts)
 
-	hook_character_trigger(trigger, fun, opts)
-	-- part is returned so that the trigger can later be deleted or toggled on-off by adding or removing it
-	return trigger
+	return hook_character_trigger(trigger, fun, opts)
 end
 
 
@@ -111,7 +149,7 @@ end
 -- a different implementation of a trigger by hooking the character's Touched instead of the trigger's Touched
 -- this allows per-character removal of triggers and a much simpler and less expensive trigger mechanism
 local function disposable_character_trigger(size, position, fun, opts)
-	local trigger = create_trigger(size, position, opts)
+	local trigger = create_trigger_part(size, position, opts)
 
 	players.on_character(function (player, character)
 		hook_disposable_character_trigger(trigger, character, fun, opts)
@@ -141,7 +179,7 @@ end
 
 return export {
 	trigger = {
-		create_trigger = create_trigger,
+		create_trigger_part = create_trigger_part,
 		hook_character_trigger = hook_character_trigger,
 		character_trigger = character_trigger,
 		hook_disposable_character_trigger = hook_disposable_character_trigger,
