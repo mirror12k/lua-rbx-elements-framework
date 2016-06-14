@@ -237,6 +237,6 @@ import 'pyros/pyros'
 
 -- slime_mountain.start()
 
-trigger.character_trigger({10, 100, 100}, {50, 50, 0}, function (tgr, player, char)
+trigger.disposable_character_trigger({10, 100, 100}, {50, 50, 0}, function (tgr, char)
 	print('character of ' .. char.Name .. ' tripped the trigger!')
 end, { debounce = 3 })

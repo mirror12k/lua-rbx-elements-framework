@@ -105,7 +105,7 @@ CharacterTrigger = class 'hydros.CharacterTrigger' {
 						self:delay_debounce_finish(player.UserId)
 					end
 					-- invoke callback
-					return self.fun(self, player, other.Parent)
+					return self.fun(self, other.Parent)
 				end
 			end
 		end)
@@ -119,13 +119,14 @@ CharacterTrigger = class 'hydros.CharacterTrigger' {
 	end),
 }
 
-local function hook_character_trigger(trigger, fun, opts)
+local function hook_character_trigger(trigger_part, fun, opts)
 	opts = opts or {}
-	return new 'hydros.CharacterTrigger' (trigger, fun, opts.debounce)
+	return new 'hydros.CharacterTrigger' (trigger_part, fun, opts.debounce)
 end
 
 -- creates an invisible trigger block which detects when a player character's torso touches it and fires the callback
--- returns the created trigger part which can be destroyed to delete the trigger
+-- returns the created trigger object which can be safely disconnected or reconnected
+-- callback will receive the trigger object and character
 -- opts can contain a debounce in seconds to prevent a single character triggering it multiple times
 local function character_trigger (size, position, fun, opts)
 	local trigger = create_trigger_part(size, position, opts)
@@ -134,25 +135,49 @@ local function character_trigger (size, position, fun, opts)
 end
 
 
-local function hook_disposable_character_trigger(trigger, character, fun, opts)
-	local connection
-	connection = character:FindFirstChild('Torso').Touched:connect(function (other)
-		if character.Humanoid.Health > 0 and other == trigger then
-			connection:disconnect()
-			return fun(trigger, character)
+
+
+local DisposableCharacterTrigger
+DisposableCharacterTrigger = class 'hydros.DisposableCharacterTrigger' {
+	_extends = TriggerObject,
+	_init = function (self, trigger_part, character, fun)
+		self.trigger_part = trigger_part
+		self.character = character
+		self.fun = fun
+		DisposableCharacterTrigger.super._init(self)
+	end,
+	connect = function (self)
+		if self.character:FindFirstChild('Torso') ~= nil and self.character:FindFirstChild('Humanoid') ~= nil then
+			self.connection = self.character.Torso.Touched:connect(function (other)
+				if other == self.trigger_part and self.character:FindFirstChild('Humanoid') ~= nil and self.character.Humanoid.Health > 0 then
+					self:disconnect()
+					return self.fun(self, self.character)
+				end
+			end)
 		end
-	end)
+	end,
+	break_connection = function (self)
+		self.connection:disconnect()
+		self.connection = nil
+	end,
+}
+
+
+
+local function hook_disposable_character_trigger(trigger_part, character, fun, opts)
+	return new 'hydros.DisposableCharacterTrigger' (trigger_part, character, fun)
 end
 
 
 
 -- a different implementation of a trigger by hooking the character's Touched instead of the trigger's Touched
+-- callback will receive the trigger object and character
 -- this allows per-character removal of triggers and a much simpler and less expensive trigger mechanism
 local function disposable_character_trigger(size, position, fun, opts)
-	local trigger = create_trigger_part(size, position, opts)
+	local trigger_part = create_trigger_part(size, position, opts)
 
 	players.on_character(function (player, character)
-		hook_disposable_character_trigger(trigger, character, fun, opts)
+		hook_disposable_character_trigger(trigger_part, character, fun, opts)
 	end)
 	-- part is returned so that the trigger can later be deleted or toggled on-off by adding or removing it
 	return trigger
