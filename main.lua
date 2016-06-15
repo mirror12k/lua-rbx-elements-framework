@@ -233,10 +233,10 @@ import 'pyros/pyros'
 
 
 
--- math.randomseed(tick())
+math.randomseed(tick())
 
--- slime_mountain.start()
+slime_mountain.start()
 
-trigger.disposable_character_trigger({10, 100, 100}, {50, 50, 0}, function (tgr, char)
-	print('character of ' .. char.Name .. ' tripped the trigger!')
-end, { debounce = 3 })
+-- trigger.disposable_character_trigger({10, 100, 100}, {50, 50, 0}, function (tgr, char)
+-- 	print('character of ' .. char.Name .. ' tripped the trigger!')
+-- end, { debounce = 3 })

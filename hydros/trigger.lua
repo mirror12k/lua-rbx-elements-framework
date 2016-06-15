@@ -187,14 +187,14 @@ end
 
 
 
-local function hook_character_absolute_teleport(trigger, position, fun, opts)
-	hook_character_trigger(trigger, function (trigger, id, character)
+local function hook_character_absolute_teleport(trigger_part, position, fun, opts)
+	hook_character_trigger(trigger_part, function (trigger, character)
 		local humanoid = character:FindFirstChild('Humanoid')
 		local torso = character:FindFirstChild('Torso')
 		if torso ~= nil and humanoid ~= nil and humanoid.Health > 0 then
 			torso.CFrame = CFrame.new(unpack(position))
 			if fun ~= nil then
-				fun(trigger, id, character)
+				fun(trigger, character)
 			end
 		end
 	end, opts)

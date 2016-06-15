@@ -575,35 +575,38 @@ local function start_slime_mountain_checkpoints(bottom, top, width, teleporter)
 	local game_triggers = {}
 	-- slime checkpoint waves
 	for _, offset in ipairs({0.2, 0.45, 0.7}) do
-
 		local new_trigger = {}
-		new_trigger.op = function (trigger, char)
+		new_trigger.fun = function (trigger, char)
 				local torso = char:FindFirstChild('Torso')
 				if torso ~= nil  and settings.spawn_slime_checkpoints == true then
 					spawn_slime_cluster(CFrame.new(unpack(top)), torso.Position, 14, 7, workspace)
 				end
 			end
-		new_trigger.trigger = trigger.disposable_character_trigger({10, 400, width},
-			{bottom[1] + (top[1] - bottom[1]) * offset, bottom[2] + (top[2] - bottom[2]) * offset, width / 2},
-			new_trigger.op)
+		new_trigger.part = trigger.create_trigger_part({10, 400, width}, {bottom[1] + (top[1] - bottom[1]) * offset, bottom[2] + (top[2] - bottom[2]) * offset, width / 2})
 		game_triggers[#game_triggers + 1] = new_trigger
 	end
+	
 	-- win trigger
-	-- make it a little wider to make sure it catches everyone
 	local new_trigger = {}
-	new_trigger.op = function (trigger, char)
+	new_trigger.fun = function (trigger, char)
 			local torso = char:FindFirstChild('Torso')
 			if torso ~= nil then
 				print('winrar')
 			end
 		end
-	new_trigger.trigger = trigger.disposable_character_trigger({10, 100, width + 40}, {top[1], 50 + top[2], width / 2}, new_trigger.op)
+	new_trigger.part = trigger.create_trigger_part({10, 100, width + 40}, {top[1], 50 + top[2], width / 2})
 	game_triggers[#game_triggers + 1] = new_trigger
 
-	trigger.hook_character_absolute_teleport(teleporter, {bottom[1], bottom[2] + 50, bottom[3] + 50}, function (_, id, char)
+	players.on_character(function (player, char)
+		for _, game_trigger in ipairs(game_triggers) do
+			trigger.hook_disposable_character_trigger(game_trigger.part, char, game_trigger.fun)
+		end
+	end)
+
+	trigger.hook_character_absolute_teleport(teleporter, {bottom[1], bottom[2] + 50, bottom[3] + 50}, function (_, char)
 		-- rehook all events on trigger
 		for _, game_trigger in ipairs(game_triggers) do
-			trigger.hook_disposable_character_trigger(game_trigger.trigger, char, game_trigger.op)
+			trigger.hook_disposable_character_trigger(game_trigger.part, char, game_trigger.fun)
 		end
 	end)
 
